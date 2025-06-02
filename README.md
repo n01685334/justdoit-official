@@ -1,2 +1,2 @@
-# justdoit-pmt
-Just Do IT - a project management tool
+# Just do IT
+A project management tool is all you need.
