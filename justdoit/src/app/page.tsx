@@ -9,6 +9,9 @@ export default function Home() {
             <Link href="/auth/login" className="mt-5 text-blue-500 hover:text-blue-700">
                 Login
             </Link>
+            <Link href="/tasks" className="mt-5 text-blue-500 hover:text-blue-700">
+                Task cards (demo)
+            </Link>
 			<Card />
         </div>
     );
