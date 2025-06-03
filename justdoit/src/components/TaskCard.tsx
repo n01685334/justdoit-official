@@ -37,10 +37,17 @@ export const userColors = [
 export default function TaskCard({ task }: { task: Task }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    e.dataTransfer.setData('taskId', task.id);
+    e.dataTransfer.setData('fromStatus', task.status);
+    e.dataTransfer.effectAllowed = 'move';
+  };
   return (
     <>
       <div 
         className={`${categoryColors[task.categoryId]} rounded-md border border-gray-700 p-4 cursor-pointer shadow-sm hover:shadow-md transition-shadow max-w-80`}
+        draggable
+        onDragStart={handleDragStart}
         onClick={() => setIsModalOpen(true)}
       >
         <div className="flex justify-between items-start">
