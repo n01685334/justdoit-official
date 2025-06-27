@@ -1,3 +1,3 @@
-export async function GET(){
-  return Response.json({"key":"value"});
+export async function GET() {
+	return Response.json({ key: "value" });
 }
