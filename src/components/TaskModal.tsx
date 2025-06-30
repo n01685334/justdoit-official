@@ -1,7 +1,7 @@
 // app/ui/task/task-detail-modal.tsx
 
 import { useState } from "react";
-import { type Task, userColors } from "./TaskCard";
+import { type Task } from "./TaskCard";
 
 interface TaskDetailModalProps {
 	task: Task;
@@ -100,21 +100,18 @@ export default function TaskDetailModal({
 				<div className="mt-6">
 					<h3 className="text-lg font-medium text-blue-400 mb-2">Comments</h3>
 
-					{task.comments &&
-						task.comments.map((comment) => (
-							<div key={comment.id} className="flex items-start mb-3">
-								<div
-									className={`${
-										userColors[comment.user.colorIndex]
-									} w-8 h-8 rounded-full flex items-center justify-center text-white font-medium mr-3 flex-shrink-0`}
-								>
-									{comment.user.initials}
-								</div>
-								<div className="bg-gray-700 rounded-lg p-3 flex-grow">
-									<p className="text-gray-300">{comment.text}</p>
-								</div>
+					{task.comments?.map((comment) => (
+						<div key={comment.id} className="flex items-start mb-3">
+							<div
+								className={` w-8 h-8 rounded-full flex items-center justify-center text-white font-medium mr-3 flex-shrink-0`}
+							>
+								{comment.user.initials}
 							</div>
-						))}
+							<div className="bg-gray-700 rounded-lg p-3 flex-grow">
+								<p className="text-gray-300">{comment.text}</p>
+							</div>
+						</div>
+					))}
 
 					<div className="flex mt-4">
 						<input

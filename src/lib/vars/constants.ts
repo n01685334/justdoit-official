@@ -1,0 +1,3 @@
+export const TEMP_DEFAULT_USER_ID = "68483de03d61dec429759557";
+export const TASK_ORDER_INCREMENT = 100;
+export const TASK_ORDER_MIN_GAP = 5;

@@ -1,70 +1,65 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { use, useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
-export default function Header() {
-	const [menuOpen, setMenuOpen] = useState(false);
-	const toggleMenu = () => setMenuOpen(!menuOpen);
+import { AuthContext, useAuth } from "@/contexts/AuthContext";
+import { ProjectContext } from "@/contexts/ProjectContext";
+import { UserResponse } from "@/types/api";
+import HeaderUserMenu from "./HeaderUserMenu";
+
+interface HeaderProps {
+	user: UserResponse;
+}
+
+const Header = ({ user }: HeaderProps) => {
+	const { project } = use(ProjectContext);
 
 	return (
-		<header className="p-8 text-center w-5/6 border-b-1 border-solid border-gray-600 mb-20">
-			<div className="flex justify-between items-center">
-				<Link
-					href="/"
-					className="text-2xl font-bold text-blue-600 hover:text-blue-800"
-				>
-					JustDoIT
-				</Link>
-				<nav className="hidden md:flex justify-center space-x-4 mt-4">
-					<Link href="/" className="text-gray-700 hover:text-blue-600">
-						Home
-					</Link>
-					<Link href="/about" className="text-gray-700 hover:text-blue-600">
-						About
-					</Link>
-					<Link href="/contact" className="text-gray-700 hover:text-blue-600">
-						Contact
-					</Link>
-				</nav>
-				<button
-					className="md:hidden  mt-4 px-4 py-2 bg-blue-600 text-gray-700 focus:outline-none rounded hover:bg-blue-800 transition-colors"
-					onClick={toggleMenu}
-				>
-					{menuOpen ? <FaTimes size={25} /> : <FaBars size={25} />}
-				</button>
-			</div>
-			{menuOpen && (
-				<div className="md:hidden bg-white dark:bg-gray-800 px-4 mt-4 flex flex-col items-center space-y-2">
-					<Link
-						href="/"
-						className="block text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text:white"
+		<header
+			className="border-b border-gray-800 px-6 py-4"
+			style={{ backgroundColor: "var(--background)" }}
+		>
+			<div className="flex items-center justify-between">
+				{/* Left section - Project title and filter */}
+				<div className="flex items-center gap-4">
+					<h1
+						className="text-xl font-semibold"
+						style={{ color: "var(--foreground)" }}
 					>
-						Home
-					</Link>
-					<Link
-						href="/"
-						className="block text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text:white"
-					>
-						Project
-					</Link>
-					<Link
-						href="/"
-						className="block text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text:white"
-					>
-						Employee
-					</Link>
-					<Link
-						href="/"
-						className="block text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text:white"
-					>
-						Settings
-					</Link>
+						{project?.name || "Unknown Project"}
+					</h1>
 				</div>
-			)}
 
-			{/* <h1 className="text-3xl font-bold">Just Do IT</h1>
-            <p className="text-lg">Your go-to source for state-level data and insights</p> */}
+				{/* Center section - Navigation */}
+				<nav className="flex items-center bg-gray-800/50 rounded-lg p-1">
+					<button
+						type="button"
+						className="px-4 py-2 text-gray-400 hover:bg-gray-700/50 hover:text-gray-200 rounded-md transition-all"
+					>
+						Project Summary
+					</button>
+					<button
+						type="button"
+						className="px-4 py-2 text-gray-400 hover:bg-gray-700/50 hover:text-gray-200 rounded-md transition-all"
+					>
+						Project Settings
+					</button>
+					<button
+						type="button"
+						className="px-4 py-2 text-gray-400 hover:bg-gray-700/50 hover:text-gray-200 rounded-md transition-all"
+					>
+						Team
+					</button>
+				</nav>
+
+				{/* Right section - User avatar */}
+				<div className="flex items-center">
+					<HeaderUserMenu user={user} />
+				</div>
+			</div>
 		</header>
 	);
-}
+};
+
+export default Header;

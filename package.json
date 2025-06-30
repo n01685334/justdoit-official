@@ -10,6 +10,7 @@
 		"lint:fix": "biome check . --write"
 	},
 	"dependencies": {
+		"clsx": "^2.1.1",
 		"justdoit": "file:",
 		"mongoose": "^8.16.1",
 		"next": "15.3.3",
