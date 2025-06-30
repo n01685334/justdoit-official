@@ -1,11 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { use, useState } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
-import { AuthContext, useAuth } from "@/contexts/AuthContext";
-import { ProjectContext } from "@/contexts/ProjectContext";
-import { UserResponse } from "@/types/api";
+import { useProject } from "@/contexts/ProjectContext";
+import type { UserResponse } from "@/types/api";
 import HeaderUserMenu from "./HeaderUserMenu";
 
 interface HeaderProps {
@@ -13,7 +9,7 @@ interface HeaderProps {
 }
 
 const Header = ({ user }: HeaderProps) => {
-	const { project } = use(ProjectContext);
+	const { project } = useProject();
 
 	return (
 		<header

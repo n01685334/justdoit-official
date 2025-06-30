@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { Project } from "@/lib/models/Schema";
 import dbConnect from "@/lib/mongoose";
 
 export async function GET(
-	request: NextRequest,
+	_request: NextRequest,
 	{ params }: { params: Promise<{ userId: string }> },
 ) {
 	try {

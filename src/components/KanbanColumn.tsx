@@ -2,8 +2,8 @@
 
 import { useProject } from "@/contexts/ProjectContext";
 import { updateTask } from "@/lib/api/api-helpers";
-import { ProjectTask } from "@/types/api";
-import { DropZone, type Task, TaskCard } from "./TaskCard";
+import type { ProjectTask } from "@/types/api";
+import { DropZone, TaskCard } from "./TaskCard";
 
 interface KanbanColumnProps {
 	title: string;

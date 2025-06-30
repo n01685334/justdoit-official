@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { Column, Task } from "@/lib/models/Schema";
 import dbConnect from "@/lib/mongoose";
 

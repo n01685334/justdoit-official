@@ -2,12 +2,12 @@
 
 import {
 	createContext,
-	Dispatch,
-	SetStateAction,
+	type Dispatch,
+	type SetStateAction,
 	useContext,
 	useState,
 } from "react";
-import { ProjectResponse, ProjectTask, UserResponse } from "@/types/api";
+import type { ProjectResponse, ProjectTask, UserResponse } from "@/types/api";
 
 type DragState = {
 	draggedTaskId: string | null;
@@ -32,13 +32,6 @@ type ProjectContextType = {
 	setTaskLoading: (taskId: string, loading: boolean) => void;
 	dragState: DragState;
 	setDragState: Dispatch<SetStateAction<DragState>>;
-};
-
-const initialProjectContext = {
-	project: null,
-	isLoading: true,
-	error: null,
-	user: null,
 };
 
 export const ProjectContext = createContext<ProjectContextType | undefined>(

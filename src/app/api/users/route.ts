@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { User } from "@/lib/models/Schema";
 import dbConnect from "@/lib/mongoose";
 
-export async function GET() {
+export async function GET(_request: NextRequest) {
 	try {
 		await dbConnect();
 		const users = await User.find({});

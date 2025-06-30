@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useProject } from "@/contexts/ProjectContext";
 import { deleteTask, updateTask } from "@/lib/api/api-helpers";
-import { ProjectTask, TaskResponse } from "@/types/api";
+import { type ProjectTask } from "@/types/api";
 
 interface EditTaskModalProps {
 	isOpen: boolean;

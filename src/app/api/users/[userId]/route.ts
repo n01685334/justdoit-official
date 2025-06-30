@@ -3,8 +3,12 @@ import { User } from "@/lib/models/Schema";
 import dbConnect from "@/lib/mongoose";
 
 export async function DELETE(
-	request: NextRequest,
-	{ params }: { params: Promise<{ userId: string }> },
+	_request: NextRequest,
+	{
+		params,
+	}: {
+		params: Promise<{ userId: string }>;
+	},
 ) {
 	try {
 		await dbConnect();
@@ -52,7 +56,7 @@ export async function PUT(
 }
 
 export async function GET(
-	request: NextRequest,
+	_request: NextRequest,
 	{ params }: { params: Promise<{ userId: string }> },
 ) {
 	try {

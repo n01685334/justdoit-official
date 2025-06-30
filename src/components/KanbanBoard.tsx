@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useProject } from "@/contexts/ProjectContext";
-import { ProjectTask } from "@/types/api";
+import type { ProjectTask } from "@/types/api";
 import CreateTaskModal from "./CreateTaskModal";
 import EditTaskModal from "./EditTaskModal";
 import Column from "./KanbanColumn";

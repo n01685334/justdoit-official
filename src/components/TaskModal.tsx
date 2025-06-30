@@ -1,7 +1,7 @@
 // app/ui/task/task-detail-modal.tsx
 
 import { useState } from "react";
-import { type Task } from "./TaskCard";
+import type { Task } from "./TaskCard";
 
 interface TaskDetailModalProps {
 	task: Task;

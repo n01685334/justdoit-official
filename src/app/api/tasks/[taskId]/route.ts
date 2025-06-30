@@ -1,12 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { Column, Task } from "@/lib/models/Schema";
 import dbConnect from "@/lib/mongoose";
 import { TASK_ORDER_INCREMENT, TASK_ORDER_MIN_GAP } from "@/lib/vars/constants";
-import { CreateTaskPayload } from "@/types/api";
+import type { CreateTaskPayload } from "@/types/api";
 
 export async function DELETE(
-	request: NextRequest,
-	{ params }: { params: Promise<{ taskId: string }> },
+	_request: NextRequest,
+	{
+		params,
+	}: {
+		params: Promise<{ taskId: string }>;
+	},
 ) {
 	try {
 		await dbConnect();

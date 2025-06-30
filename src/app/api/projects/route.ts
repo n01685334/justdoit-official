@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Project, User } from "@/lib/models/Schema";
+import { type NextRequest, NextResponse } from "next/server";
+import { Project } from "@/lib/models/Schema";
 import dbConnect from "@/lib/mongoose";
 
 export async function GET(request: NextRequest) {

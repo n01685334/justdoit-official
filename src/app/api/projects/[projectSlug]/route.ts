@@ -1,12 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Project, User } from "@/lib/models/Schema";
+import { type NextRequest, NextResponse } from "next/server";
+import { Project } from "@/lib/models/Schema";
 import dbConnect from "@/lib/mongoose";
 
 export async function GET(
-	request: NextRequest,
+	_request: NextRequest,
 	{ params }: { params: Promise<{ projectSlug: string }> },
 ) {
-	console.log("GETPROJECTID");
 	try {
 		await dbConnect();
 		const { projectSlug: slug } = await params;
@@ -33,7 +32,7 @@ export async function GET(
 			return NextResponse.json({ error: "Project not found" }, { status: 404 });
 		}
 
-		console.log(JSON.stringify(project, null, 2));
+		// console.log(JSON.stringify(project, null, 2));
 
 		return NextResponse.json({
 			data: project,

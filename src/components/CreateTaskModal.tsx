@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useProject } from "@/contexts/ProjectContext";
 import { createTask } from "@/lib/api/api-helpers";
-import { CreateTaskPayload } from "@/types/api";
+import type { CreateTaskPayload } from "@/types/api";
 
 interface CreateTaskModalProps {
 	isOpen: boolean;
