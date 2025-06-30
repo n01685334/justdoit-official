@@ -66,10 +66,10 @@ export async function PUT(
 			updatedAt: new Date(),
 		};
 
-		if (name !== undefined) updateFields.name = name;
-		if (description !== undefined) updateFields.description = description;
-		if (assignee !== undefined) updateFields.assignee = assignee;
-		if (tag !== undefined) updateFields.tag = tag;
+		if (name) updateFields.name = name;
+		if (description) updateFields.description = description;
+		if (assignee) updateFields.assignee = assignee;
+		if (tag) updateFields.tag = tag;
 
 		// Handle order and column changes
 		if (column !== undefined) {
