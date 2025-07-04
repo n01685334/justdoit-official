@@ -107,3 +107,9 @@ export interface CreateTaskPayload {
 	tag?: string;
 	dropIndex?: number;
 }
+
+export interface createProjectPayload {
+	name: string;
+	description?: string;
+	owner_id: string;
+}

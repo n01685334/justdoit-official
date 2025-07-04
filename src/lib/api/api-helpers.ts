@@ -1,10 +1,11 @@
 import type {
-  ApiResponse,
-  CreateTaskPayload,
-  ProjectResponse,
-  TaskResponse,
-  UserProjectsResponse,
-  UserResponse,
+	ApiResponse,
+	createProjectPayload,
+	CreateTaskPayload,
+	ProjectResponse,
+	TaskResponse,
+	UserProjectsResponse,
+	UserResponse,
 } from "@/types/api";
 
 
@@ -192,3 +193,31 @@ export const updateTask = async (
     };
   }
 };
+
+export const createProject = async (projectData: createProjectPayload) => {
+	try {
+		const response = await fetch(
+			`${process.env.NEXT_PUBLIC_BASE_URL}/api/projects`,
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(projectData)
+			}
+
+		)
+		if (!response.ok) {
+			const error = await response.json()
+			return { error: error.error || "Failed to create project" }
+		}
+		const result = await response.json()
+		return { project_slug: result.project_slug }
+	} catch (err) {
+		return {
+			success: false,
+			error: err instanceof Error ? err.message : "Unknown error",
+		};
+	}
+
+}
