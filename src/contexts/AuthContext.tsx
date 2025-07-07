@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import { useFetch } from "@/hooks/useFetch";
 import type { UserResponse } from "@/types/api";
 
@@ -25,11 +25,8 @@ export const AuthProvider = ({
 }) => {
 	// temporary user data fetching for development
 	const defaultUser = `/api/users/${DEFAULT_USER_ID}`;
-	// const {
-	// 	data: userData,
-	// 	loading,
-	// 	error,
-	// } = useFetch<UserResponse>(defaultUser, [DEFAULT_USER_ID]);
+	
+	const [user, setUser] = useState<UserResponse | null>(null);
 
 	// TODO: replace with real auth check
 	const checkAuth = async () => {
@@ -55,11 +52,13 @@ export const AuthProvider = ({
 		});
 
 		if (!response.ok) {
-			throw new Error("Login failed");
+			const res = await response.json();
+			throw new Error(res.message);
 		}
 
 		const userData = await response.json();
-		// setUser(userData);
+		setUser(userData);
+		console.log(userData)
 	};
 
 	// TODO: replace with real logout code.
@@ -77,11 +76,14 @@ export const AuthProvider = ({
 		});
 
 		if (!response.ok) {
-			throw new Error("Signup failed");
+			const res = await response.json();
+			throw new Error(res.message);
 		}
 
 		const userData = await response.json();
-		// setUser(userData);
+      	setUser(userData);
+
+		return userData;
 	};
 
 	const contextValue = {
@@ -94,7 +96,9 @@ export const AuthProvider = ({
 	};
 
 	return (
-		<AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+		<AuthContext.Provider value={contextValue}>
+			{children}
+		</AuthContext.Provider>
 	);
 };
 

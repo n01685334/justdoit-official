@@ -28,7 +28,7 @@ export type UpdateUserRequest = {
 
 export type UserResponse = {
 	_id: string;
-	googleId: string;
+	googleId?: string;
 	email: string;
 	name: string;
 	avatar?: string;

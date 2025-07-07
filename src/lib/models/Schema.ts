@@ -2,15 +2,17 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-	googleId: { type: String, required: true, unique: true },
-	email: { type: String, required: true, unique: true },
+	google_id: { type: String, required: false, unique: true },
 	name: { type: String, required: true },
-	avatar: { type: String }, // Google profile picture URL
+	email: { type: String, required: true, unique: true },
+	password: { type: String, required: true },
+	role: String,
+	lastActive: { type: Date, default: Date.now },
 	createdAt: { type: Date, default: Date.now },
 	updatedAt: { type: Date, default: Date.now },
 });
 
-export const User = mongoose.models.User || mongoose.model("User", userSchema);
+export const Users = mongoose.models.Users || mongoose.model("Users", userSchema);
 
 const projectSchema = new mongoose.Schema({
 	name: { type: String, required: true },
