@@ -1,4 +1,8 @@
+'use client';
+
 import FormInput, { Button, FormCard } from "@/app/ui/auth/form-elements";
+import { useAuth } from "@/contexts/AuthContext";
+import { redirect, RedirectType } from "next/navigation";
 
 const fields = [
 	{
@@ -34,8 +38,27 @@ const fields = [
 ];
 
 export default function RegisterForm() {
+
+	const {signup} = useAuth();
+
+	function HandleSignup(){
+		const name : string = document.getElementById("name")?.value;
+		const email: string = document.getElementById("email")?.value;
+		const password: string = document.getElementById("password")?.value;
+
+		if(signup){
+			signup(email, password, name)
+			.then(res => {
+				alert("You have successfully signed up!")
+				redirect("/auth/login", RedirectType.replace)
+			})
+		}else{
+			console.log("signup not defined")
+		}
+	}
+
 	return (
-		<FormCard>
+		<FormCard onSubmit={HandleSignup}>
 			{fields.map((field) => (
 				<FormInput key={field.id} {...field} />
 			))}

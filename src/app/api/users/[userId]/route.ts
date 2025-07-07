@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { User } from "@/lib/models/Schema";
+import { Users } from "@/lib/models/Schema";
 import dbConnect from "@/lib/mongoose";
 
 export async function DELETE(
@@ -13,7 +13,7 @@ export async function DELETE(
 	try {
 		await dbConnect();
 		const { userId: id } = await params;
-		const result = await User.findByIdAndDelete(id);
+		const result = await Users.findByIdAndDelete(id);
 
 		if (!result) {
 			return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -37,7 +37,7 @@ export async function PUT(
 		const { userId: id } = await params;
 		const body = await request.json();
 
-		const result = await User.findByIdAndUpdate(id, body, { new: true });
+		const result = await Users.findByIdAndUpdate(id, body, { new: true });
 
 		if (!result) {
 			return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -62,7 +62,7 @@ export async function GET(
 	try {
 		await dbConnect();
 		const { userId: id } = await params;
-		const user = await User.findById(id);
+		const user = await Users.findById(id);
 
 		if (!user) {
 			return NextResponse.json({ error: "User not found" }, { status: 404 });

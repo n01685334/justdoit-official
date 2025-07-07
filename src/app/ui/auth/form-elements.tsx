@@ -35,23 +35,31 @@ export default function FormInput({
 interface ButtonProps {
 	type?: "submit" | "button";
 	label: string;
+	onClick?: Function;
 }
 
-export function Button({ label }: ButtonProps) {
+export function Button({ label, onClick }: ButtonProps) {
 	return (
 		<button
 			type="submit"
 			className="cursor-pointer w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+			onClick={() => {if(onClick) onClick()}}
 		>
 			{label}
 		</button>
 	);
 }
 
-export function FormCard({ children }: { children: React.ReactNode }) {
+export function FormCard({ children, onSubmit }: { children: React.ReactNode, onSubmit?: Function }) {
 	return (
 		<div className="bg-gray-800 rounded-lg shadow-md border border-gray-700 p-6">
-			<form className="space-y-6">{children}</form>
+			<form className="space-y-6" 
+			onSubmit={(e) => {
+				e.preventDefault()
+				if(onSubmit) onSubmit()
+			}}>
+				{children}
+			</form>
 		</div>
 	);
 }
