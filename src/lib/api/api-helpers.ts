@@ -1,172 +1,194 @@
 import type {
-	ApiResponse,
-	CreateTaskPayload,
-	ProjectResponse,
-	TaskResponse,
-	UserProjectsResponse,
-	UserResponse,
+  ApiResponse,
+  CreateTaskPayload,
+  ProjectResponse,
+  TaskResponse,
+  UserProjectsResponse,
+  UserResponse,
 } from "@/types/api";
 
+
+const getBaseURL = () => {
+  if (typeof window !== 'undefined') {
+    // Client-side: use relative URLs
+    return '';
+  }
+  // Server-side:
+  // If NEXT_PUBLIC_BASE_URL is set (full URL with protocol), use it
+  if (process.env.NEXT_PUBLIC_BASE_URL) {
+    return process.env.NEXT_PUBLIC_BASE_URL;
+  }
+  // If running on Vercel, VERCEL_URL is the host (e.g., my-app.vercel.app)
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  // Fallback to localhost
+  return 'http://localhost:3000';
+};
+
 export const getUserById = async (userId: string): Promise<UserResponse> => {
-	try {
-		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}`,
-		);
+  try {
+    // const response = await fetch(`/api/users/${userId}`);
+	 const baseURL = getBaseURL();
+    // If baseURL is empty string, fetch will use relative path
+    const fetchUrl = baseURL
+      ? `${baseURL}/api/users/${userId}`
+      : `/api/users/${userId}`;
+    const response = await fetch(fetchUrl);
+    if (!response.ok) {
+      console.error("Error getting user data: ", await response.json());
+      throw new Error("failed to fetch user data");
+    }
 
-		if (!response.ok) {
-			console.error("Error getting user data: ", await response.json());
-			throw new Error("failed to fetch user data");
-		}
+    const { data }: ApiResponse<UserResponse> = await response.json();
 
-		const { data }: ApiResponse<UserResponse> = await response.json();
+    if (!data) {
+      throw new Error("No user data returned from API");
+    }
 
-		if (!data) {
-			throw new Error("No user data returned from API");
-		}
-
-		return data;
-	} catch (err) {
-		console.error(err);
-		throw err;
-	}
+    return data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 };
 
 export const getProjectBySlug = async (
-	projectSlug: string,
+  projectSlug: string
 ): Promise<ProjectResponse> => {
-	try {
-		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${projectSlug}`,
-		);
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${projectSlug}`
+    );
 
-		if (!response.ok) {
-			console.error("Error fetching project: ", await response.json());
-			throw new Error("failed to fetch project data");
-		}
+    if (!response.ok) {
+      console.error("Error fetching project: ", await response.json());
+      throw new Error("failed to fetch project data");
+    }
 
-		const { data }: ApiResponse<ProjectResponse> = await response.json();
+    const { data }: ApiResponse<ProjectResponse> = await response.json();
 
-		if (!data) {
-			throw new Error("No user project returned from API: ");
-		}
+    if (!data) {
+      throw new Error("No user project returned from API: ");
+    }
 
-		return data;
-	} catch (err) {
-		console.error(err);
-		throw err;
-	}
+    return data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 };
 
 export const getUserProjects = async (
-	userId: string,
+  userId: string
 ): Promise<UserProjectsResponse> => {
-	try {
-		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/user/${userId}`,
-		);
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/user/${userId}`
+    );
 
-		if (!response.ok) {
-			console.error("Error fetching projects: ", await response.json());
-			throw new Error(`failed to fetch project data for user: ${userId}`);
-		}
+    if (!response.ok) {
+      console.error("Error fetching projects: ", await response.json());
+      throw new Error(`failed to fetch project data for user: ${userId}`);
+    }
 
-		const { data }: ApiResponse<UserProjectsResponse> = await response.json();
+    const { data }: ApiResponse<UserProjectsResponse> = await response.json();
 
-		if (!data) {
-			throw new Error("No user projects returned from API");
-		}
+    if (!data) {
+      throw new Error("No user projects returned from API");
+    }
 
-		return data;
-	} catch (err) {
-		console.error(err);
-		throw err;
-	}
+    return data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 };
 
 export const createTask = async (
-	taskData: CreateTaskPayload,
+  taskData: CreateTaskPayload
 ): Promise<{ task_id?: string; error?: string }> => {
-	try {
-		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks`,
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(taskData),
-			},
-		);
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(taskData),
+      }
+    );
 
-		if (!response.ok) {
-			const error = await response.json();
-			return { error: error.error || "Failed to create task" };
-		}
-		const result = await response.json();
-		return { task_id: result.created_task_id };
-	} catch (err) {
-		return {
-			error: err instanceof Error ? err.message : "Unknown error",
-		};
-	}
+    if (!response.ok) {
+      const error = await response.json();
+      return { error: error.error || "Failed to create task" };
+    }
+    const result = await response.json();
+    return { task_id: result.created_task_id };
+  } catch (err) {
+    return {
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
 };
 
 export const deleteTask = async (
-	taskId: string,
+  taskId: string
 ): Promise<{ success: boolean; error?: string }> => {
-	try {
-		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks/${taskId}`,
-			{
-				method: "DELETE",
-			},
-		);
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks/${taskId}`,
+      {
+        method: "DELETE",
+      }
+    );
 
-		if (!response.ok) {
-			const error = await response.json();
-			return { success: false, error: error.error || "Failed to delete task" };
-		}
+    if (!response.ok) {
+      const error = await response.json();
+      return { success: false, error: error.error || "Failed to delete task" };
+    }
 
-		return { success: true };
-	} catch (err) {
-		return {
-			success: false,
-			error: err instanceof Error ? err.message : "Unknown error",
-		};
-	}
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
 };
 
 export const updateTask = async (
-	taskId: string,
-	taskData: Partial<CreateTaskPayload>,
+  taskId: string,
+  taskData: Partial<CreateTaskPayload>
 ): Promise<{
-	success: boolean;
-	error?: string;
-	data?: TaskResponse;
+  success: boolean;
+  error?: string;
+  data?: TaskResponse;
 }> => {
-	try {
-		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks/${taskId}`,
-			{
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(taskData),
-			},
-		);
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks/${taskId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(taskData),
+      }
+    );
 
-		if (!response.ok) {
-			const error = await response.json();
-			return { success: false, error: error.error || "Failed to update task" };
-		}
+    if (!response.ok) {
+      const error = await response.json();
+      return { success: false, error: error.error || "Failed to update task" };
+    }
 
-		const result = await response.json();
-		return { success: true, data: result.data };
-	} catch (err) {
-		return {
-			success: false,
-			error: err instanceof Error ? err.message : "Unknown error",
-		};
-	}
+    const result = await response.json();
+    return { success: true, data: result.data };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
 };

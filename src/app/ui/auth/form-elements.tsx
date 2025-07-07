@@ -5,6 +5,7 @@ interface FormInputProps {
 	label: string;
 	placeholder?: string;
 	required?: boolean;
+	value?: string;
 }
 
 export default function FormInput({
@@ -14,6 +15,7 @@ export default function FormInput({
 	label,
 	placeholder,
 	required,
+	value = "",
 }: FormInputProps) {
 	return (
 		<div className="space-y-2">
@@ -26,6 +28,7 @@ export default function FormInput({
 				type={type}
 				placeholder={placeholder}
 				required={required}
+				value={value}
 				className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 			/>
 		</div>
