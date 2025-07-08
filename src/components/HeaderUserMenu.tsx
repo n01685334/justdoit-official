@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from 'next/link';
 import { useEffect, useRef, useState } from "react";
 import type { UserResponse } from "@/types/api";
 
@@ -62,7 +62,7 @@ const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
 							Projects
 						</Link>
 						<Link
-							href="/profile"
+							href="/user/profile"
 							className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
 							onClick={() => setIsOpen(false)}
 						>

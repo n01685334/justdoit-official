@@ -17,11 +17,11 @@ export const Users = mongoose.models.Users || mongoose.model("Users", userSchema
 const projectSchema = new mongoose.Schema({
 	name: { type: String, required: true },
 	description: { type: String },
-	owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+	owner: { type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true },
 	members: [
 		{
 			_id: false,
-			user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+			user: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
 			role: { type: String, enum: ["admin", "member"], default: "member" },
 		},
 	],
@@ -68,10 +68,10 @@ const taskSchema = new mongoose.Schema({
 		ref: "Column",
 		required: true,
 	},
-	assignee: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+	assignee: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: "User",
+		ref: "Users",
 		required: true,
 	},
 	tag: { type: mongoose.Schema.Types.ObjectId, ref: "Tag" },
@@ -103,7 +103,7 @@ export const Task = mongoose.models.Task || mongoose.model("Task", taskSchema);
 const commentSchema = new mongoose.Schema({
 	content: { type: String, required: true },
 	task: { type: mongoose.Schema.Types.ObjectId, ref: "Task", required: true },
-	author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+	author: { type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true },
 	createdAt: { type: Date, default: Date.now },
 	updatedAt: { type: Date, default: Date.now },
 });

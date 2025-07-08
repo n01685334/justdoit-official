@@ -21,6 +21,46 @@ Our project, JUSTDOIT, is a project management tool made for IT teams and organi
 7. Data flow and optimization for multiple platforms
 8. User roles and permission checking
 
+## Task Distribution
+James
+* tasks & project dashboard (✅ Completed in Phase 2)
+* drag and drop implementation (✅ Completed in Phase 2)
+* tasks filtering
+
+Rita
+* my projects page
+* Project summary page
+
+Ayush
+* auth, login and signup flow 
+*and settings
+* task comments
+
+Ghanshyam
+* user profile page (✅ Completed in Phase 2) 
+* project settings page 
+* project user/role management
+
+## Phase 2 - Preview
+
+#### Home Page
+![home](screenshots/p2_home.png)
+
+#### Login
+![Login](screenshots/p2_login.png)
+
+#### Sign up
+![Sign Up](screenshots/p2_signup.png)
+
+#### Project page
+![Project Page](screenshots/p2_project.png)
+
+#### User Setting Page
+![User Setting Page](screenshots/p2_user_setting.png)
+
+
+
+
 ## Getting Started
 
 First, run the development server:

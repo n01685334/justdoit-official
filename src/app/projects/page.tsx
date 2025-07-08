@@ -4,6 +4,7 @@ import { TEMP_DEFAULT_USER_ID } from "@/lib/vars/constants";
 
 const Page = async () => {
 	const user = await getUserById(TEMP_DEFAULT_USER_ID);
+	console.log(user)
 	const { owner: ownedProjects, member: memberProjects } =
 		await getUserProjects(user?._id);
 
