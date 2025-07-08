@@ -7,6 +7,7 @@ import type {
 	UserProjectsResponse,
 	UserResponse,
 } from "@/types/api";
+import mongoose from "mongoose";
 
 
 const getBaseURL = () => {
@@ -220,4 +221,93 @@ export const createProject = async (projectData: createProjectPayload) => {
 		};
 	}
 
+}
+
+export const updateProject = async (projectSlug: string, projectData: Partial<createProjectPayload>):
+	Promise<{ success: boolean, error?: string, data?: ProjectResponse }> => {
+	try {
+		const response = await fetch(
+			`${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${projectSlug}`,
+			{
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(projectData),
+			},
+		);
+
+		if (!response.ok) {
+			const error = await response.json();
+			return { success: false, error: error.error || "Failed to update project" };
+		}
+
+		const result = await response.json();
+		return { success: true, data: result.data };
+	} catch (err) {
+		return {
+			success: false,
+			error: err instanceof Error ? err.message : "Unknown error",
+		};
+	}
+}
+
+export const deleteProject = async (projectSlug: string): Promise<{ success: boolean; error?: string }> => {
+	try {
+		const response = await fetch(
+			`${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${projectSlug}`,
+			{
+				method: "DELETE",
+			},
+		);
+
+		if (!response.ok) {
+			const error = await response.json();
+			return { success: false, error: error.error || "Failed to delete project" };
+		}
+
+		return { success: true };
+	} catch (err) {
+		return {
+			success: false,
+			error: err instanceof Error ? err.message : "Unknown error",
+		};
+	}
+}
+
+
+export const cascadeDeleteProject = async (projectId: string) => {
+	try {
+
+		const Column = mongoose.models.Column;
+		const Tag = mongoose.models.Tag;
+		const Task = mongoose.models.Task;
+		const Comment = mongoose.models.Comment;
+		// Find all columns associated with the project
+		const columns = await Column.find({ project: projectId });
+		const columnIds = columns.map(col => col._id);
+
+		// Find all tasks within those columns
+		const tasks = await Task.find({ column: { $in: columnIds } });
+		const taskIds = tasks.map(task => task._id);
+
+		// Delete all comments for those tasks
+		if (taskIds.length > 0) {
+			await Comment.deleteMany({ task: { $in: taskIds } });
+			await Task.deleteMany({ _id: { $in: taskIds } });
+		}
+
+		// Delete all columns
+		if (columnIds.length > 0) {
+			await Column.deleteMany({ _id: { $in: columnIds } });
+		}
+
+		// Delete all tags for the project
+		await Tag.deleteMany({ project: projectId });
+
+		console.log("Cascade deletion completed for project:", projectId);
+	} catch (error) {
+		console.error("Error during cascade delete:", error);
+		throw error;
+	}
 }
