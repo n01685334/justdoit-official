@@ -22,15 +22,26 @@ export default function FormInput({
 			<label htmlFor={id} className="block text-sm font-medium text-gray-200">
 				{label}
 			</label>
-			<input
-				id={id}
-				name={name}
-				type={type}
-				placeholder={placeholder}
-				required={required}
-				value={value}
-				className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-			/>
+			{value ? 
+				<input
+					id={id}
+					name={name}
+					type={type}
+					placeholder={placeholder}
+					required={required}
+					value={value}
+					className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+				/>
+				:
+				<input
+					id={id}
+					name={name}
+					type={type}
+					placeholder={placeholder}
+					required={required}
+					className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+				/>
+			}
 		</div>
 	);
 }
