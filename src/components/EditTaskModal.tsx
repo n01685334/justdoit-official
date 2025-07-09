@@ -87,6 +87,7 @@ export default function EditTaskModal({
 				removeTask(task._id);
 			}
 		} catch (err) {
+			console.log(err)
 		} finally {
 			onClose();
 		}

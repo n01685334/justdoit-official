@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { User } from "@/types/types";
 import { Users } from "@/lib/models/Schema";
 import jwt from "jsonwebtoken";
+import dbConnect from "@/lib/mongoose";
 
 async function createUser(email: string, password: string, name: string) {
     // Hash password
@@ -15,6 +16,7 @@ async function createUser(email: string, password: string, name: string) {
         role: "member"
     }
 
+    await dbConnect()
     await Users.create(newUser);
 
     return newUser
