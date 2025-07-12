@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { getUserById, getUserProjects } from "@/lib/api/api-helpers";
 import { TEMP_DEFAULT_USER_ID } from "@/lib/vars/constants";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/api/auth-helpers";
 
 const Page = async () => {
-	const user = await getUserById(TEMP_DEFAULT_USER_ID);
-	console.log(user)
+	// check if the user is logged in
+	const user = await getCurrentUser()
+	if(user == null){
+		redirect("/auth/login")
+	}
 	const { owner: ownedProjects, member: memberProjects } =
 		await getUserProjects(user?._id);
 

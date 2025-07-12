@@ -1,12 +1,12 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
-import { useFetch } from "@/hooks/useFetch";
 import type { UserResponse } from "@/types/api";
 
 interface AuthContextType {
 	user?: UserResponse;
 	// loading: boolean;
+	checkAuth?: () => Promise<boolean>;
 	login?: (email: string, password: string) => Promise<void>;
 	logout?: () => Promise<void>;
 	signup?: (email: string, password: string, name: string) => Promise<void>;
@@ -14,36 +14,33 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType>({});
 
-const DEFAULT_USER_ID = "";
-
 export const AuthProvider = ({
-	userData,
 	children,
 }: {
-	userData: UserResponse;
 	children: React.ReactNode;
 }) => {
-	// temporary user data fetching for development
-	const defaultUser = `/api/users/${DEFAULT_USER_ID}`;
 	
-	const [user, setUser] = useState<UserResponse | null>(null);
+	const [user, setUser] = useState<UserResponse | undefined>(undefined);
 
-	// TODO: replace with real auth check
-	const checkAuth = async () => {
+	const checkAuth = async () : Promise<boolean> => {
 		try {
 			const response = await fetch("/api/auth/me");
 			if (response.ok) {
 				const userData = await response.json();
-				// setUser(userData);
+				setUser(userData);
+				return true
+			}else{
+				return false
 			}
 		} catch (error) {
 			console.error("Auth check failed:", error);
+			return false;
 		} finally {
 			// setLoading(false);
+			return false;
 		}
 	};
 
-	// TODO: replace with real login code.
 	const login = async (email: string, password: string) => {
 		const response = await fetch("/api/auth/login", {
 			method: "POST",
@@ -58,16 +55,13 @@ export const AuthProvider = ({
 
 		const userData = await response.json();
 		setUser(userData);
-		console.log(userData)
 	};
 
-	// TODO: replace with real logout code.
 	const logout = async () => {
 		await fetch("/api/auth/logout", { method: "POST" });
-		// setUser(null);
+		setUser(undefined);
 	};
 
-	// TODO: replace with real signup code.
 	const signup = async (email: string, password: string, name: string) => {
 		const response = await fetch("/api/auth/signup", {
 			method: "POST",
@@ -82,14 +76,13 @@ export const AuthProvider = ({
 
 		const userData = await response.json();
       	setUser(userData);
-
-		return userData;
 	};
 
 	const contextValue = {
-		user: userData,
+		user: user,
 		// loading,
 		// error,
+		checkAuth,
 		login,
 		logout,
 		signup,

@@ -2,7 +2,9 @@ import Header from "@/components/Header";
 import KanbanBoard from "@/components/KanbanBoard";
 import { ProjectProvider } from "@/contexts/ProjectContext";
 import { getProjectBySlug, getUserById } from "@/lib/api/api-helpers";
+import { getCurrentUser } from "@/lib/api/auth-helpers";
 import { TEMP_DEFAULT_USER_ID } from "@/lib/vars/constants";
+import { redirect } from "next/navigation";
 
 const Page = async ({
 	params,
@@ -10,7 +12,12 @@ const Page = async ({
 	params: Promise<{ projectSlug: string }>;
 }) => {
 	const { projectSlug } = await params;
-	const user = await getUserById(TEMP_DEFAULT_USER_ID);
+	
+	const user = await getCurrentUser()
+	if(user == null){
+		redirect("/auth/login")
+	}
+
 	const project = await getProjectBySlug(projectSlug);
 
 	return (
