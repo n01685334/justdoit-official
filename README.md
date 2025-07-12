@@ -32,8 +32,8 @@ Rita
 * Project summary page
 
 Ayush
-* auth, login and signup flow 
-*and settings
+* auth, login and signup flow (✅ Completed in Phase 2) 
+* and settings
 * task comments
 
 Ghanshyam
