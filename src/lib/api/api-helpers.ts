@@ -1,5 +1,6 @@
 import type {
   ApiResponse,
+  CommentResponse,
   CreateTaskPayload,
   ProjectResponse,
   TaskResponse,
@@ -192,3 +193,91 @@ export const updateTask = async (
     };
   }
 };
+
+// Commenting Feature CRUD
+export const addComment = async (
+  content: string,
+  taskId: string,
+  userId: string
+): Promise<{
+  success: boolean;
+  error?: string;
+  data?: string;
+}> => {
+  try{
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/comments/${taskId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: content,
+          author: userId
+        }),
+      }
+    );
+
+    const result = await response.json();
+    return { success: true, data: result.data };
+  }catch(err){
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Unknown error"
+    };
+  }
+}
+
+export const getCommentsById = async (
+  taskId: string
+): Promise<{
+  success: boolean;
+  error?: string;
+  data?: CommentResponse[];
+}> => {
+  try{
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/comments/${taskId}`)
+
+    const result = await response.json()
+    console.log("getCommentsById: " + JSON.stringify(result))
+    return { success: true, data: result };
+  }catch(err){
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Unknown error"
+    };
+  }
+}
+
+export const deleteCommentById = async (
+  taskId : string,
+  commentId : string
+): Promise<{
+  success: boolean;
+  error?: string;
+  data?: CommentResponse[];
+}> => {
+  try{
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/comments/${taskId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          commentId: commentId
+        }),
+      }
+    );
+
+    const result = await response.json()
+    return { success: true, data: result };
+  }catch(err){
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Unknown error"
+    };
+  }
+}

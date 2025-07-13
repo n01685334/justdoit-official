@@ -98,6 +98,18 @@ export type TaskResponse = {
 	updatedAt: Date;
 };
 
+export type CommentResponse = {
+	_id: string;
+	content: string;
+	author: {
+		_id: string,
+		name: string
+	};
+	task: string;
+	createdAt: Date;
+	updatedAt: Date;
+}
+
 export interface CreateTaskPayload {
 	name: string;
 	description: string;
