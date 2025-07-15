@@ -6,7 +6,6 @@ import { useProject } from "@/contexts/ProjectContext";
 import { addComment, deleteCommentById, deleteTask, getCommentsById, updateTask } from "@/lib/api/api-helpers";
 import { CommentResponse, type ProjectTask } from "@/types/api";
 import HeaderUserMenu from "./HeaderUserMenu";
-import { Comment } from "@/lib/models/Schema";
 
 interface EditTaskModalProps {
 	isOpen: boolean;
@@ -39,6 +38,7 @@ export default function EditTaskModal({
 	);
 	const [userComment, setUserComment] = useState("")
 	const [comments, setComments] = useState<CommentResponse[]>([])
+	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
 		refreshComments();
@@ -106,6 +106,7 @@ export default function EditTaskModal({
 		if(res.data !== undefined){
 			setComments(res.data)
 		}
+		setLoading(false)
 	}
 
 	const handleComment = async () => {
@@ -308,6 +309,7 @@ export default function EditTaskModal({
 				</div>
 
 				{/* Showing all comments */}
+				{loading && <div>Loading...</div>}
 				{ comments.length > 0 && 
 				<div className="overflow-y-auto h-90 pr-4">
 					{
@@ -315,11 +317,11 @@ export default function EditTaskModal({
 							<div key={comment._id} className="p-2 px-4 my-2 bg-gray-900 rounded-md">
 								<div className="flex justify-between mb-2">
 									<div>
-									<span className="font-bold text-md">{comment.author.name}</span>
+									<span className="font-bold text-md">{comment.author[0].name}</span>
 									<span className="italic text-sm ml-2 text-gray-400">{getFormattedDate(comment.createdAt)}</span>
 									</div>
 
-									{ comment.author._id === user._id &&
+									{ comment.author[0]._id === user._id &&
 									<div>
 										<button
 											type="button"

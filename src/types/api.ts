@@ -101,10 +101,10 @@ export type TaskResponse = {
 export type CommentResponse = {
 	_id: string;
 	content: string;
-	author: {
+	author: [{
 		_id: string,
 		name: string
-	};
+	}];
 	task: string;
 	createdAt: Date;
 	updatedAt: Date;
