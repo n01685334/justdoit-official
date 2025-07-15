@@ -3,13 +3,19 @@
 import { useProject } from "@/contexts/ProjectContext";
 import type { UserResponse } from "@/types/api";
 import HeaderUserMenu from "./HeaderUserMenu";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
 	user: UserResponse;
 }
 
 const Header = ({ user }: HeaderProps) => {
-	const { project } = useProject();
+	const { project, isOwner } = useProject();
+	const router = useRouter();
+
+	const navigateToProjectSettings = () => {
+		router.push(`/project/${project?.slug}/settings`);
+	}
 
 	return (
 		<header
@@ -35,12 +41,15 @@ const Header = ({ user }: HeaderProps) => {
 					>
 						Project Summary
 					</button>
-					<button
-						type="button"
-						className="px-4 py-2 text-gray-400 hover:bg-gray-700/50 hover:text-gray-200 rounded-md transition-all"
-					>
-						Project Settings
-					</button>
+					{isOwner && (
+						<button
+							type="button"
+							onClick={navigateToProjectSettings}
+							className="px-4 py-2 text-gray-400 hover:bg-gray-700/50 hover:text-gray-200 rounded-md transition-all"
+						>
+							Project Settings
+						</button>
+					)}
 					<button
 						type="button"
 						className="px-4 py-2 text-gray-400 hover:bg-gray-700/50 hover:text-gray-200 rounded-md transition-all"

@@ -1,8 +1,16 @@
-import Link from "next/link";
 import { getUserById, getUserProjects } from "@/lib/api/api-helpers";
 import { TEMP_DEFAULT_USER_ID } from "@/lib/vars/constants";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/api/auth-helpers";
+import HeaderUserMenu from "@/components/HeaderUserMenu";
+import { UserResponse } from "@/types/api";
+import ProjectsList from "@/components/UserProjects";
+import { revalidatePath } from "next/cache";
+
+async function refreshProjects() {
+	"use server";
+	revalidatePath("/projects");
+}
 
 const Page = async () => {
 	// check if the user is logged in
@@ -14,25 +22,30 @@ const Page = async () => {
 		await getUserProjects(user?._id);
 
 	return (
-		<div>
-			<h2>My Projects</h2>
-			<ul>
-				{ownedProjects?.map((p) => (
-					<li key={p._id}>
-						<Link href={`/project/${p.slug}`}>{p.name}</Link>
-					</li>
-				))}
-			</ul>
-			<h2>Projects I Belong To</h2>
-			<ul>
-				{memberProjects?.map((p) => (
-					<li key={p._id}>
-						<Link href={`/project/${p.slug}`}>{p.name}</Link>
-					</li>
-				))}
-			</ul>
+		<div className="p-6">
+			<Header user={user} />
+			<h3 className="text-xl font-semibold mb-2">My Projects</h3>
+			<ProjectsList projects={ownedProjects} ownerId={user?._id} refreshProjects={refreshProjects} />
+			<h3 className="text-xl font-semibold mb-2 mt-6">Projects I Belong To</h3>
+			<ProjectsList projects={memberProjects} />
 		</div>
 	);
 };
 
 export default Page;
+
+interface HeaderProps {
+	user: UserResponse;
+}
+const Header = ({ user }: HeaderProps) => {
+	return (
+		<header className="border-b border-gray-200 dark:border-gray-700 px-6 py-4 mb-6">
+			<div className="flex items-center justify-between">
+				<h1 className="text-xl font-semibold">Projects</h1>
+				<HeaderUserMenu user={user} />
+			</div>
+		</header>
+	);
+}
+
+
