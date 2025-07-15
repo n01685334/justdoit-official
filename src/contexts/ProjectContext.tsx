@@ -32,6 +32,7 @@ type ProjectContextType = {
 	setTaskLoading: (taskId: string, loading: boolean) => void;
 	dragState: DragState;
 	setDragState: Dispatch<SetStateAction<DragState>>;
+	isOwner: boolean;
 };
 
 export const ProjectContext = createContext<ProjectContextType | undefined>(
@@ -233,6 +234,7 @@ export const ProjectProvider = ({
 		setDragState,
 		updateProject,
 		inviteMember,
+		isOwner: project?.owner?._id === user?._id,
 	};
 
 	return (

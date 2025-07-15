@@ -4,13 +4,19 @@ import { useProject } from "@/contexts/ProjectContext";
 import type { UserResponse } from "@/types/api";
 import HeaderUserMenu from "./HeaderUserMenu";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
 	user: UserResponse;
 }
 
 const Header = ({ user }: HeaderProps) => {
-	const { project } = useProject();
+	const { project, isOwner } = useProject();
+	const router = useRouter();
+
+	const navigateToProjectSettings = () => {
+		router.push(`/project/${project?.slug}/settings`);
+	}
 
 	return (
 		<header

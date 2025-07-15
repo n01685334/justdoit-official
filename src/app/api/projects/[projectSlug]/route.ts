@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { Project } from "@/lib/models/Schema";
 import dbConnect from "@/lib/mongoose";
+import { cascadeDeleteProject } from "@/lib/api/api-helpers";
 
 export async function GET(
 	_request: NextRequest,
@@ -45,8 +46,6 @@ export async function GET(
 	}
 }
 
-
-
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ projectSlug: string }> }
@@ -68,4 +67,31 @@ export async function PUT(
   } catch (err) {
     return NextResponse.json({ error: `Update failed: ${err}` }, { status: 500 });
   }
+}
+
+export async function DELETE(
+	_request: NextRequest,
+	{ params }: { params: Promise<{ projectSlug: string }> },
+) {
+	try {
+		await dbConnect();
+		const { projectSlug: slug } = await params;
+		const project = await Project.findOne({ slug });
+
+		if (!project) {
+			return NextResponse.json({ error: "Project not found" }, { status: 404 });
+		}
+
+		await cascadeDeleteProject(project._id.toString());
+		await project.deleteOne();
+
+		return NextResponse.json({
+			message: "Project deleted successfully",
+		});
+	} catch (error) {
+		return NextResponse.json(
+			{ error: `Failed to delete project: ${error}` },
+			{ status: 500 },
+		);
+	}
 }
