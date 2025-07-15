@@ -27,14 +27,15 @@ export type UpdateUserRequest = {
 };
 
 export type UserResponse = {
-	_id: string;
-	googleId?: string;
-	email: string;
+	google_id?: string;
+	_id?: string;
 	name: string;
-	role: string;
-	avatar?: string;
-	// createdAt: Date;
-	// updatedAt: Date;
+	email: string;
+	__v?: number
+	role: ProjectRole;
+	lastActive?: Date;
+	createdAt?: Date;
+	updatedAt?: Date;
 };
 
 export interface ProjectTask {
@@ -96,6 +97,18 @@ export type TaskResponse = {
 	createdAt: Date;
 	updatedAt: Date;
 };
+
+export type CommentResponse = {
+	_id: string;
+	content: string;
+	author: {
+		_id: string,
+		name: string
+	};
+	task: string;
+	createdAt: Date;
+	updatedAt: Date;
+}
 
 export interface CreateTaskPayload {
 	name: string;

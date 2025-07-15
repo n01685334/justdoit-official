@@ -2,7 +2,7 @@
 
 import FormInput, { Button, FormCard } from "@/app/ui/auth/form-elements";
 import { useAuth } from "@/contexts/AuthContext";
-import { redirect, RedirectType } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const fields = [
 	{
@@ -25,6 +25,7 @@ const fields = [
 export default function LoginForm() {
 
 	const {login} = useAuth();
+	const router = useRouter()
 	
 	function HandleLogin(){
 		const email: string = document.getElementById("email")?.value;
@@ -32,9 +33,9 @@ export default function LoginForm() {
 
 		if(login){
 			login(email, password)
-			.then(res => {
+			.then(() => {
 				alert("You have successfully logged in!")
-				redirect("/", RedirectType.replace)
+				router.back()
 			}).catch(err => {
 				alert(err)
 			})

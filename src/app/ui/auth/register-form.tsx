@@ -2,7 +2,7 @@
 
 import FormInput, { Button, FormCard } from "@/app/ui/auth/form-elements";
 import { useAuth } from "@/contexts/AuthContext";
-import { redirect, RedirectType } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 const fields = [
 	{
@@ -40,6 +40,7 @@ const fields = [
 export default function RegisterForm() {
 
 	const {signup} = useAuth();
+		const router = useRouter()
 
 	function HandleSignup(){
 		const name : string = document.getElementById("name")?.value;
@@ -48,9 +49,9 @@ export default function RegisterForm() {
 
 		if(signup){
 			signup(email, password, name)
-			.then(res => {
+			.then(() => {
 				alert("You have successfully signed up!")
-				redirect("/auth/login", RedirectType.replace)
+				router.back()
 			})
 		}else{
 			console.log("signup not defined")

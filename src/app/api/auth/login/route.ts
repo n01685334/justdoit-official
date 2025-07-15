@@ -3,8 +3,10 @@ import bcrypt from 'bcryptjs';
 import { User } from "@/types/types";
 import { Users } from "@/lib/models/Schema";
 import jwt from "jsonwebtoken";
+import dbConnect from "@/lib/mongoose";
 
 async function getUserByEmail(email: string) {
+	await dbConnect()
 	const user = Users.findOne({email: email})
 	return user;
 }

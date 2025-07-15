@@ -5,7 +5,6 @@ import { useAuth } from '@/contexts/AuthContext';
 
 import { useRouter } from 'next/navigation';
 import FormInput, { Button } from '@/app/ui/auth/form-elements';
-import { log } from 'console';
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -15,7 +14,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!user) {
-      router.push('/login');
+      router.push('/auth/login');
       return;
     }
     setName(user.name);
@@ -25,7 +24,7 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     try {
-      const res = await fetch(`/api/users/${user._id}`, {
+      const res = await fetch(`/api/users/${user?._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),

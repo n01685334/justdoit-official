@@ -103,7 +103,7 @@ export const Task = mongoose.models.Task || mongoose.model("Task", taskSchema);
 const commentSchema = new mongoose.Schema({
 	content: { type: String, required: true },
 	task: { type: mongoose.Schema.Types.ObjectId, ref: "Task", required: true },
-	author: { type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true },
+	author: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true }],
 	createdAt: { type: Date, default: Date.now },
 	updatedAt: { type: Date, default: Date.now },
 });

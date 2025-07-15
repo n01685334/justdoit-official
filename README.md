@@ -28,17 +28,17 @@ James
 * tasks filtering
 
 Rita
-* my projects page
+* My projects page
 * Project summary page
 
 Ayush
-* auth, login and signup flow 
-*and settings
-* task comments
+* auth, login and signup flow (✅ Completed in Phase 2)
+* and settings
+* task comments (✅ Completed in Phase 3)
 
 Ghanshyam
 * user profile page (✅ Completed in Phase 2) 
-* project settings page 
+* project settings page (✅ Completed in Phase 3)
 * project user/role management
 
 ## Phase 2 - Preview

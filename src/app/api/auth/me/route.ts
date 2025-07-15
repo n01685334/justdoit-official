@@ -1,3 +1,5 @@
-export async function POST() {
-  return Response.json({ message: 'Checking your auth in a second' })
+import { getCurrentUser } from "@/lib/api/auth-helpers";
+
+export async function GET() {
+	return await getCurrentUser()
 }
