@@ -32,7 +32,6 @@ export async function GET(
 			return NextResponse.json({ error: "Project not found" }, { status: 404 });
 		}
 
-		// console.log(JSON.stringify(project, null, 2));
 
 		return NextResponse.json({
 			data: project,
@@ -44,4 +43,29 @@ export async function GET(
 			{ status: 500 },
 		);
 	}
+}
+
+
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ projectSlug: string }> }
+) {
+  try {
+    await dbConnect();
+    const { projectSlug } = await params;
+    const { title } = await request.json();
+
+    const updated = await Project.findOneAndUpdate(
+      { slug: projectSlug },
+      { title },
+      { new: true }
+    );
+    if (!updated) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
+    return NextResponse.json({ data: updated, message: 'Project updated' });
+  } catch (err) {
+    return NextResponse.json({ error: `Update failed: ${err}` }, { status: 500 });
+  }
 }

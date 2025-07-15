@@ -3,6 +3,7 @@
 import { useProject } from "@/contexts/ProjectContext";
 import type { UserResponse } from "@/types/api";
 import HeaderUserMenu from "./HeaderUserMenu";
+import Link from "next/link";
 
 interface HeaderProps {
 	user: UserResponse;
@@ -35,12 +36,12 @@ const Header = ({ user }: HeaderProps) => {
 					>
 						Project Summary
 					</button>
-					<button
-						type="button"
+					<Link
+						href={`/project//${project?.slug}/settings`}
 						className="px-4 py-2 text-gray-400 hover:bg-gray-700/50 hover:text-gray-200 rounded-md transition-all"
 					>
 						Project Settings
-					</button>
+					</Link>
 					<button
 						type="button"
 						className="px-4 py-2 text-gray-400 hover:bg-gray-700/50 hover:text-gray-200 rounded-md transition-all"

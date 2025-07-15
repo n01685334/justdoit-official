@@ -58,6 +58,9 @@ Ghanshyam
 #### User Setting Page
 ![User Setting Page](screenshots/p2_user_setting.png)
 
+## Project Setting Page
+![Project Setting Page](screenshots/p2_project_setting.png)
+
 
 
 
