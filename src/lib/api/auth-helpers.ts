@@ -1,5 +1,4 @@
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
 import jwt from 'jsonwebtoken';
 
 export const isAuthenticated = async (): Promise<boolean>=> {
@@ -10,9 +9,10 @@ export const isAuthenticated = async (): Promise<boolean>=> {
     }
 
     try {
-        const decoded = jwt.verify(access_token.value, process.env.JWT_SECRET);
+        jwt.verify(access_token.value, process.env.JWT_SECRET);
         return true
     } catch(err) {
+        console.log("[ERROR] isAuthenticated: " + err)
         return false
     }
 }

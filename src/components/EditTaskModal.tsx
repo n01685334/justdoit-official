@@ -1,10 +1,12 @@
 /** biome-ignore-all lint/a11y/noLabelWithoutControl: <explanation> */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useProject } from "@/contexts/ProjectContext";
-import { deleteTask, updateTask } from "@/lib/api/api-helpers";
-import { type ProjectTask } from "@/types/api";
+import { addComment, deleteCommentById, deleteTask, getCommentsById, updateTask } from "@/lib/api/api-helpers";
+import { CommentResponse, type ProjectTask } from "@/types/api";
+import HeaderUserMenu from "./HeaderUserMenu";
+import { Comment } from "@/lib/models/Schema";
 
 interface EditTaskModalProps {
 	isOpen: boolean;
@@ -35,6 +37,12 @@ export default function EditTaskModal({
 	const [selectedAssignee, setSelectedAssignee] = useState(
 		task.assignee?._id || "",
 	);
+	const [userComment, setUserComment] = useState("")
+	const [comments, setComments] = useState<CommentResponse[]>([])
+
+	useEffect(() => {
+		refreshComments();
+	} , [])
 
 	if (!project || !user) return null;
 
@@ -93,23 +101,47 @@ export default function EditTaskModal({
 		}
 	};
 
+	const refreshComments = async () => {
+		const res = await getCommentsById(task._id)
+		if(res.data !== undefined){
+			setComments(res.data)
+		}
+	}
+
+	const handleComment = async () => {
+		if(user._id){
+			const res = await addComment(userComment, task._id, user._id)
+			if(res.success){
+				setUserComment("")
+				refreshComments()
+			}
+		}
+	}
+
+	const handleDeleteComment = async (commentId: string) => {
+		const res = await deleteCommentById(task._id, commentId)
+		if(res.success){
+			refreshComments()
+		}
+	}
+
+	const getFormattedDate = (date: Date) => {
+		const formatted = new Date(date)
+		return formatted.toDateString()
+	}
+
 	if (!isOpen) return null;
 
 	return (
 		<div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+			<div className="grid grid-cols-2">
+			{/* Task Modal */}
 			<div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg p-6 shadow-2xl border border-gray-200 dark:border-gray-700">
 				{/* Header */}
 				<div className="flex justify-between items-center mb-6">
 					<h2 className="text-2xl font-bold text-gray-900 dark:text-white">
 						Edit Task
 					</h2>
-					<button
-						type="button"
-						onClick={onClose}
-						className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl"
-					>
-						✕
-					</button>
 				</div>
 
 				{/* Form */}
@@ -232,6 +264,82 @@ export default function EditTaskModal({
 						</button>
 					</div>
 				</div>
+			</div>
+			{/* End of task modal div */}
+
+			{/* Comments modal Div */}
+			<div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg p-6 shadow-2xl border border-gray-200 dark:border-gray-700">
+				<div className="flex justify-between items-center mb-6">
+					<h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+						Comments
+					</h2>
+					<button
+						type="button"
+						onClick={onClose}
+						className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl"
+					>
+						✕
+					</button>
+				</div>
+
+				{/* Add a comment */}
+				<div className="space-y-4">
+					<div>
+						<div className="flex flex-row gap-2">
+							<HeaderUserMenu user={user} />
+							<input
+								type="text"
+								value={userComment}
+								onChange={(e) => setUserComment(e.target.value)}
+								placeholder="Enter your comment"
+								id="tComment"
+								className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							/>
+						</div>
+						<button
+							type="button"
+							onClick={handleComment}
+							disabled={userComment.trim().length <= 0 ? true : false}
+							className={userComment.trim().length <= 0 ? "bg-gray-600 p-2 px-3 rounded-md my-2" : "bg-green-600 hover:bg-green-800 dark:hover:bg-green-400 p-2 px-3 rounded-md my-2"}
+						>
+							Comment
+						</button>
+					</div>
+				</div>
+
+				{/* Showing all comments */}
+				{ comments.length > 0 && 
+				<div className="overflow-y-auto h-90 pr-4">
+					{
+						comments.toReversed().map(comment => 
+							<div key={comment._id} className="p-2 px-4 my-2 bg-gray-900 rounded-md">
+								<div className="flex justify-between mb-2">
+									<div>
+									<span className="font-bold text-md">{comment.author.name}</span>
+									<span className="italic text-sm ml-2 text-gray-400">{getFormattedDate(comment.createdAt)}</span>
+									</div>
+
+									{ comment.author._id === user._id &&
+									<div>
+										<button
+											type="button"
+											onClick={() => {handleDeleteComment(comment._id)}}
+										>
+											🗑️
+										</button>
+									</div>
+									}
+								</div>
+								<div>
+									╰ {comment.content}
+								</div>
+							</div>
+						)
+					}
+				</div>
+				}
+			</div>
+			{/* End of comments div */}
 			</div>
 		</div>
 	);
