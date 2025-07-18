@@ -32,7 +32,7 @@ export default function EditTaskModal({
 	const [taskName, setTaskName] = useState(task.name);
 	const [description, setDescription] = useState(task.description || "");
 	const [selectedColumn, setSelectedColumn] = useState(currentColumnId);
-	const [selectedTag, setSelectedTag] = useState(""); // TODO: Get from task.tags[0] if exists
+	const [selectedTag, setSelectedTag] = useState(task.tag?._id || "");
 	const [selectedAssignee, setSelectedAssignee] = useState(
 		task.assignee?._id || "",
 	);

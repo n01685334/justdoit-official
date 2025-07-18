@@ -47,6 +47,13 @@ export interface ProjectTask {
 		name: string;
 	};
 	comments: string[]; // Array of comment IDs
+	tag?: TagResponse
+}
+
+export interface TagResponse {
+	_id: string;
+	name: string;
+	color: string;
 }
 
 export type ProjectResponse = {
