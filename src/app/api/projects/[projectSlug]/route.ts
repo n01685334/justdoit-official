@@ -22,10 +22,16 @@ export async function GET(
 					path: "tasks",
 					select: "name description comments order",
 					options: { sort: { order: 1 } },
-					populate: {
-						path: "assignee",
-						select: "name",
-					},
+					populate: [
+						{
+							path: "assignee",
+							select: "name",
+						},
+						{
+							path: "tag",
+							select: "name color"
+						}
+					],
 				},
 			});
 

@@ -17,6 +17,10 @@ const Header = ({ user }: HeaderProps) => {
 		router.push(`/project/${project?.slug}/settings`);
 	}
 
+	const navigateToProjectSummary = () => {
+		router.push(`/project/${project?.slug}/summary`);
+	}
+
 	return (
 		<header
 			className="border-b border-gray-800 px-6 py-4"
@@ -37,6 +41,7 @@ const Header = ({ user }: HeaderProps) => {
 				<nav className="flex items-center bg-gray-800/50 rounded-lg p-1">
 					<button
 						type="button"
+						onClick={navigateToProjectSummary}
 						className="px-4 py-2 text-gray-400 hover:bg-gray-700/50 hover:text-gray-200 rounded-md transition-all"
 					>
 						Project Summary
