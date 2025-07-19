@@ -110,6 +110,24 @@ export default function TaskAttachments({ taskId, userId }: TaskAttachmentsProps
     window.open(`/api/attachments/download/${attachment.fileId}`, '_blank');
   };
 
+  const handleDeleteAttachment = async (attachment: Attachment) => {
+    if (!attachment.fileId) return;
+
+    try {
+      const response = await fetch(`/api/attachments/delete/${attachment.fileId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Delete failed');
+
+      // Remove from local state using fileId instead of id
+      setAttachments(prev => prev.filter(att => att.fileId !== attachment.fileId));
+
+    } catch (error) {
+      console.error('Delete error:', error);
+    }
+  }
+
 
   useEffect(() => {
     const loadExistingAttachments = async () => {
@@ -208,7 +226,13 @@ export default function TaskAttachments({ taskId, userId }: TaskAttachmentsProps
 
                 <button
                   type="button"
-                  onClick={() => handleRemoveAttachment(attachment.id)}
+                  onClick={() => {
+                    if (attachment.fileId) {
+                      handleDeleteAttachment(attachment);
+                    } else {
+                      handleRemoveAttachment(attachment.id);
+                    }
+                  }}
                   className="text-red-500 hover:text-red-700 dark:hover:text-red-400 text-sm"
                 >
                   ✕
