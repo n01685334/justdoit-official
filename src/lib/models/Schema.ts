@@ -78,13 +78,15 @@ const taskSchema = new mongoose.Schema({
 	dueDate: { type: Date },
 	completed: { type: Boolean, default: false },
 	order: { type: Number, required: true }, // For task ordering within column
+	// Replace attachments array with GridFS file IDs
 	attachments: [
 		{
-			filename: { type: String, required: true },
-			data: { type: Buffer, required: true }, // Store file as Buffer
+			fileId: { type: mongoose.Schema.Types.ObjectId, required: true }, // GridFS file _id
+			filename: { type: String, required: true }, // Sanitized filename
 			mimetype: { type: String, required: true },
 			size: { type: Number, required: true },
 			uploadedAt: { type: Date, default: Date.now },
+			uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true },
 		},
 	],
 	createdAt: { type: Date, default: Date.now },

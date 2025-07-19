@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import { useProject } from "@/contexts/ProjectContext";
 import { updateTask } from "@/lib/api/api-helpers";
-import { TASK_ORDER_INCREMENT } from "@/lib/vars/constants";
 import type { ProjectResponse, ProjectTask } from "@/types/api";
 
 interface User {

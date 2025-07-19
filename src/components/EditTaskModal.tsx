@@ -6,6 +6,7 @@ import { useProject } from "@/contexts/ProjectContext";
 import { addComment, deleteCommentById, deleteTask, getCommentsById, updateTask } from "@/lib/api/api-helpers";
 import { CommentResponse, type ProjectTask } from "@/types/api";
 import HeaderUserMenu from "./HeaderUserMenu";
+import TaskAttachments from "./TaskAttachments";
 
 interface EditTaskModalProps {
 	isOpen: boolean;
@@ -40,6 +41,7 @@ export default function EditTaskModal({
 	const [comments, setComments] = useState<CommentResponse[]>([])
 	const [loading, setLoading] = useState(true)
 
+  // TODO: fix useeffect
 	useEffect(() => {
 		refreshComments();
 	} , [])
@@ -235,6 +237,8 @@ export default function EditTaskModal({
 							</select>
 						</div>
 					</div>
+          {/* Task Attachments */}
+          <TaskAttachments userId={user._id ?? ""} taskId={task._id}/>
 				</div>
 
 				{/* Actions */}
