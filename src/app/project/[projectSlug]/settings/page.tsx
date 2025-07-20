@@ -1,24 +1,174 @@
-import DeleteProjectModal from "@/components/DeleteProjectModal";
+'use client';
 
-const Page = async ({ params }: { params: Promise<{ projectSlug: string }> }) => {
-    const { projectSlug } = await params;
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
+import FormInput, { Button } from '@/app/ui/auth/form-elements';
+import {
+  ProjectProvider,
+  useProject,
+} from '@/contexts/ProjectContext';
+import { log } from 'console';
 
-    return (
-        <div className="p-6 min-h-screen bg-gray-100 dark:bg-gray-900">
-            <h1 className="text-2xl font-bold mb-4">Project Settings</h1>
-            <p className="text-gray-700 dark:text-gray-300">
-                This is the settings page for your project. Here you can manage project details, members, and more.
-            </p>
+type Member = {
+  role: string;
+  user: { _id: string; name: string };
+};
 
-            <div className="mt-6 flex items-center space-x-4">
-                <button className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">Edit Project</button>
-                <DeleteProjectModal projectSlug={projectSlug} />
-            </div>
-        </div>
-    )
+type RawResponse = {
+  data: {
+    _id: string;
+    name: string;
+    slug: string;
+    members: Member[];
+  };
+};
+
+export default function ProjectSettingsPage() {
+  const { projectSlug } = useParams();
+  const { user } = useAuth();
+  const [initialProject, setInitialProject] = useState<RawResponse['data'] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/api/projects/${projectSlug}`)
+      .then(r => r.json())
+      .then((json: RawResponse) => setInitialProject(json.data))
+      .catch(() => alert('Failed to load project'))
+      .finally(() => setLoading(false));
+  }, [projectSlug]);
+
+  if (loading || !initialProject) return <p>Loading…</p>;
+
+  return (
+    <ProjectProvider initialProject={initialProject} user={user}>
+      <SettingsContent />
+    </ProjectProvider>
+  );
 }
 
-export default Page;
+function SettingsContent() {
+  const { user} = useAuth();
+  const { project,  updateProject, inviteMember } = useProject();
+  const [editingName, setEditingName] = useState(false);
+  const [name, setName] = useState(project.name);
+  const [inviteEmail, setInviteEmail] = useState('');
 
-//TODO: add common layout for the project/slug pages
+  // look up your membership role in this project
+  const membership = project.members.find(m => m.user._id === "686b374298328eae02669c2f");
+  console.log("User id ",user?._id);
+  
+  const isAdmin = membership?.role === 'admin';
 
+  const handleNameSave = () => {
+    updateProject({ name }).then(() => setEditingName(false));
+  };
+
+  const handleInvite = () => {
+    inviteMember({ email: inviteEmail }).then(() => setInviteEmail(''));
+  };
+
+  return (
+    <div className="max-w-3xl mx-auto py-8 space-y-8">
+      <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+        Project Settings
+      </h1>
+
+      {/* — Name Section — */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 space-y-2">
+        <div className="flex justify-between items-center">
+          <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+            Name
+          </span>
+          {isAdmin && (
+            <button
+              type="button"
+              className="text-sm text-blue-500 hover:underline"
+              onClick={() => setEditingName(true)}
+            >
+              Edit
+            </button>
+          )}
+        </div>
+
+        {!editingName ? (
+          <p className="text-gray-900 dark:text-gray-100">{project.name}</p>
+        ) : (
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              handleNameSave();
+            }}
+            className="mt-4 flex items-center space-x-4"
+          >
+            <div className="flex-1 max-w-sm">
+              <FormInput
+                id="project-name"
+                name="projectName"
+                type="text"
+                label=""
+                value={name}
+                onChange={e => setName(e.target.value)}
+              />
+            </div>
+            <div className="flex space-x-2">
+              <Button type="submit" label="Save" />
+              <Button type="button" label="Cancel" onClick={() => setEditingName(false)} />
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* — Members Section — */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 space-y-4">
+        <div className="flex justify-between items-center">
+          <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+            Members
+          </span>
+          {!isAdmin && (
+            <span className="text-sm text-gray-500">Read-only</span>
+          )}
+        </div>
+
+        {/* list */}
+        <div className="space-y-2">
+          {project.members.map(({ user: mUser, role }) => (
+            <div
+              key={mUser._id}
+              className="flex justify-between py-1 border-b border-gray-200 dark:border-gray-700"
+            >
+              <span className="text-gray-900 dark:text-gray-100">
+                {mUser.name}
+              </span>
+              <span className="text-sm text-gray-500">{role}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* invite form */}
+        {isAdmin && (
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              handleInvite();
+            }}
+            className="mt-4 flex items-center space-x-4"
+          >
+            <div className="flex-1 max-w-sm">
+              <FormInput
+                id="invite-email"
+                name="inviteEmail"
+                type="email"
+                label=""
+                placeholder="user@example.com"
+                value={inviteEmail}
+                onChange={e => setInviteEmail(e.target.value)}
+              />
+            </div>
+            <Button type="submit" label="Invite" />
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}

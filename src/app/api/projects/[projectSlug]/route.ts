@@ -43,8 +43,6 @@ export async function GET(
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    // console.log(JSON.stringify(project, null, 2));
-
     return NextResponse.json({
       data: project,
       message: "User fetched successfully",
@@ -54,6 +52,29 @@ export async function GET(
       { error: `Failed to fetch project: ${error}` },
       { status: 500 },
     );
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ projectSlug: string }> }
+) {
+  try {
+    await dbConnect();
+    const { projectSlug } = await params;
+    const { title } = await request.json();
+
+    const updated = await Project.findOneAndUpdate(
+      { slug: projectSlug },
+      { title },
+      { new: true }
+    );
+    if (!updated) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
+    return NextResponse.json({ data: updated, message: 'Project updated' });
+  } catch (err) {
+    return NextResponse.json({ error: `Update failed: ${err}` }, { status: 500 });
   }
 }
 
@@ -79,37 +100,6 @@ export async function DELETE(
   } catch (error) {
     return NextResponse.json(
       { error: `Failed to delete project: ${error}` },
-      { status: 500 },
-    );
-  }
-}
-
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ projectSlug: string }> },
-) {
-  try {
-    await dbConnect();
-    const { projectSlug: slug } = await params;
-    const body = await request.json();
-
-    const updatedProject = await Project.findOneAndUpdate(
-      { slug },
-      body,
-      { new: true, runValidators: true },
-    );
-
-    if (!updatedProject) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({
-      data: updatedProject,
-      message: "Project updated successfully",
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { error: `Failed to update project: ${error}` },
       { status: 500 },
     );
   }
