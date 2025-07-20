@@ -22,6 +22,8 @@ export async function POST(
       { new: true }
     ).populate('members.user');
 
+    console.log(`[/api/projects/projectSlug/members] Project: ${project}`)
+
     if (!project) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }

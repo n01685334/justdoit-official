@@ -1,14 +1,13 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import FormInput, { Button } from '@/app/ui/auth/form-elements';
-import {
-  ProjectProvider,
-  useProject,
-} from '@/contexts/ProjectContext';
-import { log } from 'console';
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import FormInput, {
+  Button,
+  FormInputWithValues,
+} from "@/app/ui/auth/form-elements";
+import { ProjectProvider, useProject } from "@/contexts/ProjectContext";
 
 type Member = {
   role: string;
@@ -27,14 +26,16 @@ type RawResponse = {
 export default function ProjectSettingsPage() {
   const { projectSlug } = useParams();
   const { user } = useAuth();
-  const [initialProject, setInitialProject] = useState<RawResponse['data'] | null>(null);
+  const [initialProject, setInitialProject] = useState<
+    RawResponse["data"] | null
+  >(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`/api/projects/${projectSlug}`)
-      .then(r => r.json())
+      .then((r) => r.json())
       .then((json: RawResponse) => setInitialProject(json.data))
-      .catch(() => alert('Failed to load project'))
+      .catch(() => alert("Failed to load project"))
       .finally(() => setLoading(false));
   }, [projectSlug]);
 
@@ -48,24 +49,22 @@ export default function ProjectSettingsPage() {
 }
 
 function SettingsContent() {
-  const { user} = useAuth();
-  const { project,  updateProject, inviteMember } = useProject();
+  const { user } = useAuth();
+  const { project, updateProject, inviteMember } = useProject();
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(project.name);
-  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteEmail, setInviteEmail] = useState("");
 
   // look up your membership role in this project
-  const membership = project.members.find(m => m.user._id === "686b374298328eae02669c2f");
-  console.log("User id ",user?._id);
-  
-  const isAdmin = membership?.role === 'admin';
+  const membership = project.members.find((m) => m.user._id === user?._id);
+  const isAdmin = membership?.role === "admin";
 
   const handleNameSave = () => {
     updateProject({ name }).then(() => setEditingName(false));
   };
 
   const handleInvite = () => {
-    inviteMember({ email: inviteEmail }).then(() => setInviteEmail(''));
+    inviteMember({ email: inviteEmail }).then(() => setInviteEmail(""));
   };
 
   return (
@@ -95,25 +94,29 @@ function SettingsContent() {
           <p className="text-gray-900 dark:text-gray-100">{project.name}</p>
         ) : (
           <form
-            onSubmit={e => {
+            onSubmit={(e) => {
               e.preventDefault();
               handleNameSave();
             }}
             className="mt-4 flex items-center space-x-4"
           >
             <div className="flex-1 max-w-sm">
-              <FormInput
+              <FormInputWithValues
                 id="project-name"
                 name="projectName"
                 type="text"
                 label=""
                 value={name}
-                onChange={e => setName(e.target.value)}
+                handleOnChange={(e) => setName(e.target.value)}
               />
             </div>
             <div className="flex space-x-2">
               <Button type="submit" label="Save" />
-              <Button type="button" label="Cancel" onClick={() => setEditingName(false)} />
+              <Button
+                type="button"
+                label="Cancel"
+                onClick={() => setEditingName(false)}
+              />
             </div>
           </form>
         )}
@@ -125,9 +128,7 @@ function SettingsContent() {
           <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
             Members
           </span>
-          {!isAdmin && (
-            <span className="text-sm text-gray-500">Read-only</span>
-          )}
+          {!isAdmin && <span className="text-sm text-gray-500">Read-only</span>}
         </div>
 
         {/* list */}
@@ -148,24 +149,29 @@ function SettingsContent() {
         {/* invite form */}
         {isAdmin && (
           <form
-            onSubmit={e => {
+            onSubmit={(e) => {
               e.preventDefault();
               handleInvite();
+              console.log(inviteEmail);
             }}
-            className="mt-4 flex items-center space-x-4"
+            className="mt-4 flex flex-row items-center justify-center space-x-4"
           >
-            <div className="flex-1 max-w-sm">
-              <FormInput
+            <div className="flex-4">
+              <FormInputWithValues
                 id="invite-email"
                 name="inviteEmail"
                 type="email"
                 label=""
                 placeholder="user@example.com"
                 value={inviteEmail}
-                onChange={e => setInviteEmail(e.target.value)}
+                handleOnChange={(e) => setInviteEmail(e.target.value)}
               />
             </div>
-            <Button type="submit" label="Invite" />
+            <Button
+              type="submit"
+              label="Invite"
+              className="cursor-pointer w-full flex-1 justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+            />
           </form>
         )}
       </div>
