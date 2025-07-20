@@ -29,7 +29,7 @@ export type UpdateUserRequest = {
 
 export type UserResponse = {
   google_id?: string;
-  _id?: string;
+  _id: string;
   name: string;
   email: string;
   __v?: number

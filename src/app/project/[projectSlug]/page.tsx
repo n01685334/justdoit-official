@@ -12,12 +12,16 @@ const Page = async ({
 }) => {
   const { projectSlug } = await params;
 
-  const user = await getCurrentUser()
-  if (user == null) {
-    redirect("/auth/login")
+  const user = await getCurrentUser();
+  if (user === undefined) {
+    redirect("/auth/login");
   }
 
   const project = await getProjectBySlug(projectSlug);
+  if (user._id !== project.owner._id) {
+    console.log("Unauthorized! Redirecting...");
+    redirect("/projects");
+  }
 
   return (
     <div className="p-6 min-h-screen bg-gray-100 dark:bg-gray-900">

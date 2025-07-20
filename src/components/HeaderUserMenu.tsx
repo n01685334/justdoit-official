@@ -1,8 +1,9 @@
 "use client";
 
-import Link from 'next/link';
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { UserResponse } from "@/types/api";
+import { useRouter } from "next/navigation";
 
 interface HeaderUserMenuProps {
   user: UserResponse;
@@ -19,9 +20,7 @@ export const getInitials = (name: string) => {
 
 const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
-
-
-
+  const router = useRouter();
   const avatarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,6 +41,18 @@ const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
       window.removeEventListener("click", handleClick);
     };
   }, [isOpen]);
+
+  const handleLogout = async () => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/logout`
+    );
+    if (res.ok) {
+      console.log("Logged out...");
+      router.push("/auth/login");
+    } else {
+      console.log("Failed to log out...");
+    }
+  };
 
   return (
     <div ref={avatarRef} className="relative">
@@ -74,8 +85,7 @@ const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
               type="button"
               onClick={() => {
                 setIsOpen(false);
-                // Add logout logic here
-                console.log("Logout clicked");
+                handleLogout();
               }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
