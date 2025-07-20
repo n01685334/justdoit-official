@@ -1,6 +1,13 @@
 import Link from "next/link";
 import Card from "@/components/Footer";
 
+// MAIN TODO
+
+// TODO: make sure all pages/ components have a top-level comment explaining the comment/component
+// TODO: all views should be at least partially responsive
+// TODO: all types should be imported from a central types directory
+
+
 export default function Home() {
 	return (
 		<div className="bg-black-200 flex flex-col justify-center items-center w-full h-screen">

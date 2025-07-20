@@ -119,7 +119,7 @@ export default function TaskDetailModal({
 							placeholder="add comment"
 							className="flex-grow bg-gray-700 border border-blue-500 rounded-lg p-3 mr-2 text-gray-300 placeholder-gray-500"
 						/>
-						<button className="bg-blue-600 text-white px-4 py-2 rounded-lg">
+						<button type="button" className="bg-blue-600 text-white px-4 py-2 rounded-lg">
 							send
 						</button>
 					</div>
