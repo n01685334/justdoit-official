@@ -46,7 +46,7 @@ export function FormInputWithValues({
   placeholder,
   required,
   value = "",
-  handleOnChange = () => {},
+  handleOnChange = () => { },
 }: FormInputProps) {
   return (
     <div className="space-y-2">

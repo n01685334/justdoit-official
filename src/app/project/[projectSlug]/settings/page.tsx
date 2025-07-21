@@ -3,15 +3,13 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import FormInput, {
-  Button,
-  FormInputWithValues,
-} from "@/app/ui/auth/form-elements";
+import FormInput, { Button } from "@/app/ui/auth/form-elements";
 import { ProjectProvider, useProject } from "@/contexts/ProjectContext";
+import UserAvatar from "@/components/UserAvatar";
 
 type Member = {
   role: string;
-  user: { _id: string; name: string };
+  user: { _id: string; name: string; avatar?: string };
 };
 
 type RawResponse = {
@@ -19,6 +17,7 @@ type RawResponse = {
     _id: string;
     name: string;
     slug: string;
+    description?: string;
     members: Member[];
   };
 };
@@ -26,9 +25,7 @@ type RawResponse = {
 export default function ProjectSettingsPage() {
   const { projectSlug } = useParams();
   const { user } = useAuth();
-  const [initialProject, setInitialProject] = useState<
-    RawResponse["data"] | null
-  >(null);
+  const [initialProject, setInitialProject] = useState<RawResponse["data"] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,9 +50,12 @@ function SettingsContent() {
   const { project, updateProject, inviteMember } = useProject();
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(project.name);
+  const [editingDescription, setEditingDescription] = useState(false);
+  const [description, setDescription] = useState(project.description || "");
   const [inviteEmail, setInviteEmail] = useState("");
+  const [editingRoleFor, setEditingRoleFor] = useState<string | null>(null);
+  const [newRole, setNewRole] = useState<string>("");
 
-  // look up your membership role in this project
   const membership = project.members.find((m) => m.user._id === user?._id);
   const isAdmin = membership?.role === "admin";
 
@@ -63,8 +63,49 @@ function SettingsContent() {
     updateProject({ name }).then(() => setEditingName(false));
   };
 
+  const handleDescriptionSave = () => {
+    updateProject({ description }).then(() => setEditingDescription(false));
+  };
+
   const handleInvite = () => {
     inviteMember({ email: inviteEmail }).then(() => setInviteEmail(""));
+  };
+
+  const handleEditRole = (memberId: string, currentRole: string) => {
+    setEditingRoleFor(memberId);
+    setNewRole(currentRole);
+  };
+
+  const updateMemberRole = async (memberId: string, role: string) => {
+    try {
+      const res = await fetch(`/api/projects/${project.slug}/members/${memberId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
+      });
+      if (!res.ok) throw new Error("Update failed");
+      const data = await res.json();
+      project.members = data.data;
+    } catch (err) {
+      console.error(err);
+      alert("Unable to update role");
+    }
+    setEditingRoleFor(null);
+  };
+
+  const handleRemoveMember = async (memberId: string) => {
+    if (!confirm("Are you sure you want to remove this member?")) return;
+    try {
+      const res = await fetch(`/api/projects/${project.slug}/members/${memberId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Remove failed");
+      const data = await res.json();
+      project.members = data.data;
+    } catch (err) {
+      console.error(err);
+      alert("Unable to remove member");
+    }
   };
 
   return (
@@ -73,7 +114,7 @@ function SettingsContent() {
         Project Settings
       </h1>
 
-      {/* — Name Section — */}
+      {/* Name Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 space-y-2">
         <div className="flex justify-between items-center">
           <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
@@ -89,7 +130,6 @@ function SettingsContent() {
             </button>
           )}
         </div>
-
         {!editingName ? (
           <p className="text-gray-900 dark:text-gray-100">{project.name}</p>
         ) : (
@@ -101,13 +141,11 @@ function SettingsContent() {
             className="mt-4 flex items-center space-x-4"
           >
             <div className="flex-1 max-w-sm">
-              <FormInputWithValues
+              <input
                 id="project-name"
-                name="projectName"
-                type="text"
-                label=""
                 value={name}
-                handleOnChange={(e) => setName(e.target.value)}
+                onChange={(e) => setName(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
             <div className="flex space-x-2">
@@ -122,7 +160,62 @@ function SettingsContent() {
         )}
       </div>
 
-      {/* — Members Section — */}
+      {/* Description Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 space-y-2">
+        <div className="flex justify-between items-center">
+          <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+            Description
+          </span>
+          {isAdmin && (
+            <button
+              type="button"
+              className="text-sm text-blue-500 hover:underline"
+              onClick={() => setEditingDescription(true)}
+            >
+              Edit
+            </button>
+          )}
+        </div>
+        {!editingDescription ? (
+          <p className="text-gray-900 dark:text-gray-100">
+            {project.description || "No description"}
+          </p>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleDescriptionSave();
+            }}
+            className="mt-4 space-y-4"
+          >
+            <div>
+              <label
+                htmlFor="project-description"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Description
+              </label>
+              <textarea
+                id="project-description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                rows={3}
+              />
+            </div>
+            <div className="flex space-x-2">
+              <Button type="submit" label="Save" />
+              <Button
+                type="button"
+                label="Cancel"
+                onClick={() => setEditingDescription(false)}
+              />
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* Members Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 space-y-4">
         <div className="flex justify-between items-center">
           <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
@@ -130,34 +223,73 @@ function SettingsContent() {
           </span>
           {!isAdmin && <span className="text-sm text-gray-500">Read-only</span>}
         </div>
-
-        {/* list */}
         <div className="space-y-2">
           {project.members.map(({ user: mUser, role }) => (
             <div
               key={mUser._id}
-              className="flex justify-between py-1 border-b border-gray-200 dark:border-gray-700"
+              className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700"
             >
-              <span className="text-gray-900 dark:text-gray-100">
-                {mUser.name}
-              </span>
-              <span className="text-sm text-gray-500">{role}</span>
+              <div className="flex items-center space-x-3">
+                <UserAvatar user={mUser} size={32} />
+                <span className="text-gray-900 dark:text-gray-100">{mUser.name}</span>
+              </div>
+              {editingRoleFor === mUser._id ? (
+                <div className="flex items-center space-x-2">
+                  <select
+                    value={newRole}
+                    onChange={(e) => setNewRole(e.target.value)}
+                    className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    <option value="admin">Admin</option>
+                    <option value="member">Member</option>
+                  </select>
+                  <Button
+                    type="button"
+                    label="Save"
+                    onClick={() => updateMemberRole(mUser._id, newRole)}
+                  />
+                  <Button
+                    type="button"
+                    label="Cancel"
+                    onClick={() => setEditingRoleFor(null)}
+                  />
+                </div>
+              ) : (
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm text-gray-500">{role}</span>
+                  {isAdmin && (
+                    <>
+                      <button
+                        type="button"
+                        className="text-sm text-blue-500 hover:underline"
+                        onClick={() => handleEditRole(mUser._id, role)}
+                      >
+                        Edit Role
+                      </button>
+                      <button
+                        type="button"
+                        className="text-sm text-red-500 hover:underline"
+                        onClick={() => handleRemoveMember(mUser._id)}
+                      >
+                        Remove
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
-
-        {/* invite form */}
         {isAdmin && (
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleInvite();
-              console.log(inviteEmail);
             }}
             className="mt-4 flex flex-row items-center justify-center space-x-4"
           >
             <div className="flex-4">
-              <FormInputWithValues
+              <FormInput
                 id="invite-email"
                 name="inviteEmail"
                 type="email"
