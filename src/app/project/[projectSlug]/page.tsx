@@ -18,10 +18,11 @@ const Page = async ({
   }
 
   const project = await getProjectBySlug(projectSlug);
-  if (
-    user._id !== project.owner._id ||
-    !project.members.find((member) => user._id === member.user._id)
-  ) {
+  const isMember =
+    project.members.find((member) => user._id === member.user._id) !==
+    undefined;
+  console.log(isMember);
+  if (user._id !== project.owner._id && !isMember) {
     console.log("Unauthorized! Redirecting...");
     redirect("/projects");
   }
