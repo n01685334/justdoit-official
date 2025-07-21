@@ -7,12 +7,15 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: String,
+  avatar: { type: String },
+  bio: { type: String },
   lastActive: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
-export const Users = mongoose.models.Users || mongoose.model("Users", userSchema);
+export const Users =
+  mongoose.models.Users || mongoose.model("Users", userSchema);
 
 const projectSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -86,7 +89,11 @@ const taskSchema = new mongoose.Schema({
       mimetype: { type: String, required: true },
       size: { type: Number, required: true },
       uploadedAt: { type: Date, default: Date.now },
-      uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true },
+      uploadedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Users",
+        required: true,
+      },
     },
   ],
   createdAt: { type: Date, default: Date.now },
@@ -109,7 +116,11 @@ export const Task = mongoose.models.Task || mongoose.model("Task", taskSchema);
 const commentSchema = new mongoose.Schema({
   content: { type: String, required: true },
   task: { type: mongoose.Schema.Types.ObjectId, ref: "Task", required: true },
-  author: { type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true },
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+    required: true,
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

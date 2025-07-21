@@ -32,8 +32,11 @@ export type UserResponse = {
   _id: string;
   name: string;
   email: string;
-  __v?: number
+  __v?: number;
   role: ProjectRole;
+  avatar?: string;
+  rm;
+  bio?: string;
   lastActive?: Date;
   createdAt?: Date;
   updatedAt?: Date;
@@ -47,10 +50,10 @@ export interface ProjectTask {
     _id: string;
     name: string;
   };
-  comments: string[]; // Array of comment IDs
+  comments: string[];
   commentCount?: number;
-  attachments?: Attachment[]
-  tag?: TagResponse
+  attachments?: Attachment[];
+  tag?: TagResponse;
 }
 
 export interface TagResponse {
@@ -112,13 +115,13 @@ export type CommentResponse = {
   _id: string;
   content: string;
   author: {
-    _id: string,
-    name: string
+    _id: string;
+    name: string;
   };
   task: string;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 export interface CreateTaskPayload {
   name: string;

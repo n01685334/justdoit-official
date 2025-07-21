@@ -5,7 +5,7 @@ import dbConnect from "@/lib/mongoose";
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ projectSlug: string }> },
+  { params }: { params: Promise<{ projectSlug: string }> }
 ) {
   try {
     await dbConnect();
@@ -29,12 +29,12 @@ export async function GET(
             },
             {
               path: "tag",
-              select: "name color"
+              select: "name color",
             },
             {
               path: "comments",
-              select: "_id"
-            }
+              select: "_id",
+            },
           ],
         },
       });
@@ -50,7 +50,7 @@ export async function GET(
   } catch (error) {
     return NextResponse.json(
       { error: `Failed to fetch project: ${error}` },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -62,25 +62,32 @@ export async function PUT(
   try {
     await dbConnect();
     const { projectSlug } = await params;
-    const { title } = await request.json();
+    const { name, description } = await request.json();
+
+    const updateData: any = {};
+    if (name) updateData.name = name;
+    if (description) updateData.description = description;
 
     const updated = await Project.findOneAndUpdate(
       { slug: projectSlug },
-      { title },
+      updateData,
       { new: true }
     );
     if (!updated) {
-      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
-    return NextResponse.json({ data: updated, message: 'Project updated' });
+    return NextResponse.json({ data: updated, message: "Project updated" });
   } catch (err) {
-    return NextResponse.json({ error: `Update failed: ${err}` }, { status: 500 });
+    return NextResponse.json(
+      { error: `Update failed: ${err}` },
+      { status: 500 }
+    );
   }
 }
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ projectSlug: string }> },
+  { params }: { params: Promise<{ projectSlug: string }> }
 ) {
   try {
     await dbConnect();
@@ -100,7 +107,7 @@ export async function DELETE(
   } catch (error) {
     return NextResponse.json(
       { error: `Failed to delete project: ${error}` },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

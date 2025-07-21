@@ -5,11 +5,11 @@ import type { UserResponse } from "@/types/api";
 
 interface AuthContextType {
   user?: UserResponse;
-  // loading: boolean;
   checkAuth?: () => Promise<boolean>;
   login?: (email: string, password: string) => Promise<void>;
   logout?: () => Promise<void>;
   signup?: (email: string, password: string, name: string) => Promise<void>;
+  updateUser?: (userData: Partial<UserResponse>) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>({});
@@ -19,14 +19,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const checkAuth = async (): Promise<boolean> => {
     try {
-      const response = await fetch("/api/auth/me");
+      const response = await fetch("/api/auth/me", { cache: "no-store" });
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
         return true;
-      } else {
-        return false;
       }
+      return false;
     } catch (error) {
       console.error("Auth check failed:", error);
       return false;
@@ -70,14 +69,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(userData);
   };
 
+  const updateUser = async (userData: Partial<UserResponse>) => {
+    if (!user?._id) throw new Error("User not authenticated");
+    console.log("Updating user with:", userData);
+    const response = await fetch(`/api/users/${user._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      const res = await response.json();
+      throw new Error(res.message || "Update failed");
+    }
+
+    const updatedUser = await response.json();
+    setUser(updatedUser.data);
+  };
+
   const contextValue = {
-    user: user,
-    // loading,
-    // error,
+    user,
     checkAuth,
     login,
     logout,
     signup,
+    updateUser,
   };
 
   return (
@@ -90,6 +106,5 @@ export function useAuth() {
   if (!context) {
     throw new Error("useAuth must be used inside AuthProvider");
   }
-
   return context;
 }
