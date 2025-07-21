@@ -33,14 +33,23 @@ export default function ProfilePage() {
     if (!user?._id || !updateUser) return;
     try {
       console.log("Saving to API:", { name, bio });
-      await updateUser({ name, bio });
-      const response = await fetch(`/api/auth/me`, { cache: "no-store" });
-      if (response.ok) {
-        const updatedUser = await response.json();
-        setName(updatedUser.name || "");
-        setBio(updatedUser.bio || "");
+      const response = await updateUser({ name, bio });
+      // Fetch updated user data and new token from API
+      const updateResponse = await fetch(`/api/users/${user._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, bio }),
+      });
+      if (updateResponse.ok) {
+        const updatedData = await updateResponse.json();
+        setName(updatedData.data.name || "");
+        setBio(updatedData.data.bio || "");
+        // Update the JWT token in the cookie client-side
+        if (updatedData.token) {
+          document.cookie = `token=${updatedData.token}; path=/; secure; samesite=strict`;
+        }
       }
-      router.refresh();
+      router.refresh(); // Refresh to use the updated token
       setEditing(false);
     } catch (err) {
       console.error("Failed to save:", err);

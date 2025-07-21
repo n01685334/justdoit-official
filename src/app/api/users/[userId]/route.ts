@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { Users } from "@/lib/models/Schema";
 import dbConnect from "@/lib/mongoose";
+import jwt from "jsonwebtoken";
 
 export async function DELETE(
   _request: NextRequest,
@@ -40,7 +41,7 @@ export async function PUT(
     console.log("API received:", { userId, name, bio });
     const updatedUser = await Users.findByIdAndUpdate(
       userId,
-      { $set: { name, bio }, updatedAt: Date.now() },
+      { $set: { name, bio, updatedAt: Date.now() } },
       { new: true, runValidators: true }
     );
 
@@ -48,7 +49,26 @@ export async function PUT(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ data: updatedUser });
+    // Generate a new JWT token with updated user data
+    const token = jwt.sign(
+      {
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        bio: updatedUser.bio,
+        email: updatedUser.email,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    const result = NextResponse.json({ data: updatedUser, token });
+
+    result.cookies.set("access_token", token, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return result;
   } catch (err) {
     console.error("Update error:", err);
     return NextResponse.json(
