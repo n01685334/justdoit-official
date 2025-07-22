@@ -1,5 +1,6 @@
 import { JwtPayload } from "jsonwebtoken";
-import { UserResponse } from "./api";
+import { Dispatch, SetStateAction } from "react";
+import { ProjectResponse, ProjectTask, UserResponse } from "./api";
 
 export type ProjectRole = "admin" | "member";
 
@@ -33,3 +34,31 @@ export interface AuthContextType {
   signup?: (email: string, password: string, name: string) => Promise<void>;
   updateUser?: (userData: Partial<UserResponse>) => Promise<void>;
 }
+
+export type DragState = {
+  draggedTaskId: string | null;
+  fromColumnId: string | null;
+  isDragging: boolean;
+};
+
+export type ProjectContextType = {
+  project: ProjectResponse | null;
+  user: UserResponse | null;
+  isLoading: boolean;
+  error: string | null;
+  addTask: (columnId: string, newTask: ProjectTask) => void;
+  updateTask: (taskId: string, updatedTask: ProjectTask) => void;
+  moveTaskToColumn: (
+    taskId: string,
+    fromColumnId: string,
+    toColumnId: string,
+    dropIndex?: number
+  ) => void;
+  removeTask: (taskId: string) => void;
+  setTaskLoading: (taskId: string, loading: boolean) => void;
+  dragState: DragState;
+  setDragState: Dispatch<SetStateAction<DragState>>;
+  isOwner: boolean;
+  inviteMember: (payload?: object) => Promise<void>;
+  updateProject: (payload?: object) => Promise<void>;
+};
