@@ -1,41 +1,18 @@
 "use client";
 
 import {
-  createContext,
-  type Dispatch,
-  type SetStateAction,
-  useContext,
-  useState,
+  createContext, useContext,
+  useState
 } from "react";
 import type { ProjectResponse, ProjectTask, UserResponse } from "@/types/api";
+import { DragState, ProjectContextType } from "@/types/types";
 
-type DragState = {
-  draggedTaskId: string | null;
-  fromColumnId: string | null;
-  isDragging: boolean;
-};
-
-type ProjectContextType = {
-  project: ProjectResponse | null;
-  user: UserResponse | null;
-  isLoading: boolean;
-  error: string | null;
-  addTask: (columnId: string, newTask: ProjectTask) => void;
-  updateTask: (taskId: string, updatedTask: ProjectTask) => void;
-  moveTaskToColumn: (
-    taskId: string,
-    fromColumnId: string,
-    toColumnId: string,
-    dropIndex?: number
-  ) => void;
-  removeTask: (taskId: string) => void;
-  setTaskLoading: (taskId: string, loading: boolean) => void;
-  dragState: DragState;
-  setDragState: Dispatch<SetStateAction<DragState>>;
-  isOwner: boolean;
-  inviteMember: (payload?: object) => Promise<void>;
-  updateProject: (payload?: object) => Promise<void>;
-};
+/**
+ * Project context provider for managing project state, tasks, and drag-and-drop operations.
+ * Handles task CRUD operations, column movements, project updates, member invitations,
+ * and provides drag state management for kanban board functionality.
+ * Requires user authentication and initial project data to function.
+ */
 
 export const ProjectContext = createContext<ProjectContextType | undefined>(
   undefined

@@ -1,10 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button } from "@/app/ui/auth/form-elements";
 import UserAvatar from "@/components/UserAvatar";
+import { useAuth } from "@/contexts/AuthContext";
+/**
+ * User profile page with inline editing capabilities and avatar upload.
+ * Handles profile updates, JWT token refresh, avatar management, and authentication state.
+ * Features toggle between view and edit modes with form validation and error handling.
+ */
 
 export default function ProfilePage() {
   const { user, logout, updateUser, checkAuth } = useAuth();

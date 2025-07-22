@@ -22,6 +22,11 @@ const fields = [
     required: true,
   },
 ];
+/**
+ * Login form component with authentication integration and user feedback.
+ * Handles form submission, displays success/error messages, and redirects
+ * to projects page on successful authentication with loading states.
+ */
 
 export default function LoginForm() {
   const [message, setMessage] = useState<{

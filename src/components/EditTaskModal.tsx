@@ -15,6 +15,12 @@ interface EditTaskModalProps {
   currentColumnId: string | null;
 }
 
+/**
+ * Modal component for editing tasks with integrated comments system.
+ * Handles task updates, deletion, column movement, and real-time comment management.
+ * Features dual-panel layout with task editing on left and comments on right.
+ */
+
 export default function EditTaskModal({
   isOpen,
   onClose,

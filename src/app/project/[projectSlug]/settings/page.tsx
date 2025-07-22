@@ -22,6 +22,12 @@ type RawResponse = {
   };
 };
 
+/**
+ * Project settings page with role-based editing capabilities for project details and member management.
+ * Handles inline editing of project name/description, member role updates, invitations, and removals.
+ * Features admin-only controls with read-only view for regular members.
+ */
+
 export default function ProjectSettingsPage() {
   const { projectSlug } = useParams();
   const { user } = useAuth();

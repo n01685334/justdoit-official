@@ -2,13 +2,11 @@ import Link from "next/link";
 import Card from "@/components/Footer";
 import { getCurrentUser } from "@/lib/api/auth-helpers";
 
-// MAIN TODO
-
-// TODO: make sure all pages/ components have a top-level comment explaining the comment/component
-// TODO: all views should be at least partially responsive
-// TODO: all types should be imported from a central types directory
-
-
+/**
+ * Main application entry point and landing page with authentication-aware navigation.
+ * Serves as the primary gateway, directing authenticated users to projects and
+ * unauthenticated users to registration/login flows with app branding.
+ */
 export default async function Home() {
 
   const user = await getCurrentUser();

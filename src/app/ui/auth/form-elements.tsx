@@ -9,6 +9,12 @@ interface FormInputProps {
   handleOnChange?: (e: any) => void;
 }
 
+/**
+ * Reusable form components for consistent input styling and behavior.
+ * Includes controlled and uncontrolled input variants, styled buttons,
+ * and form container with automatic submit handling.
+ */
+
 export default function FormInput({
   id,
   name,

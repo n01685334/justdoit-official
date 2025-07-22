@@ -1,4 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
+import { UserResponse } from "./api";
 
 export type ProjectRole = "admin" | "member";
 
@@ -23,4 +24,12 @@ export interface JwtUser extends JwtPayload {
   name: string,
   role: string,
   bio: string,
+}
+export interface AuthContextType {
+  user?: UserResponse;
+  checkAuth?: () => Promise<boolean>;
+  login?: (email: string, password: string) => Promise<void>;
+  logout?: () => Promise<void>;
+  signup?: (email: string, password: string, name: string) => Promise<void>;
+  updateUser?: (userData: Partial<UserResponse>) => Promise<void>;
 }

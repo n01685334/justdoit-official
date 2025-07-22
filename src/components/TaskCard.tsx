@@ -7,7 +7,7 @@ import type { ProjectResponse, ProjectTask } from "@/types/api";
 import { getInitials } from "./HeaderUserMenu";
 import { Attachment } from "./TaskAttachments";
 
-interface User {
+interface TaskCardUser {
   id: string;
   name: string;
   initials: string;
@@ -21,15 +21,21 @@ export interface Task {
   categoryId: number;
   status: string;
   tag?: string;
-  assignee?: User;
+  assignee?: TaskCardUser;
   attachments?: Attachment[];
   commentCount?: number;
   comments?: {
     id: string;
     text: string;
-    user: User;
+    user: TaskCardUser;
   }[];
 }
+
+/**
+ * Draggable task card component with drop zone functionality for kanban board.
+ * Handles drag-and-drop operations, optimistic updates, and displays task metadata.
+ * Features intelligent drop zone positioning and visual feedback during drag operations.
+ */
 
 export interface TaskDropZoneProps {
   onDrop: () => void;
