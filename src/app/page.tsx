@@ -33,12 +33,10 @@ export default async function Home() {
           >
             Login
           </Link>
-          <Link href="/projects" className="mt-5 text-blue-500 hover:text-blue-700">
-            All Projects
+          <Link href="/auth/register" className="mt-5 text-blue-500 hover:text-blue-700">
+            Register
           </Link>
-          <Link href="/tasks" className="mt-5 text-blue-500 hover:text-blue-700">
-            Task cards (demo)
-          </Link></>
+        </>
       )}
 
       <Card />

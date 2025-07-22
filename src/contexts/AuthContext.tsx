@@ -14,8 +14,8 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType>({});
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<UserResponse | undefined>(undefined);
+export const AuthProvider = ({ userData, children }: { userData: UserResponse | undefined, children: React.ReactNode }) => {
+  const [user, setUser] = useState<UserResponse | undefined>(userData);
 
   const checkAuth = async (): Promise<boolean> => {
     try {

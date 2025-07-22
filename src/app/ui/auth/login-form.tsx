@@ -55,9 +55,10 @@ export default function LoginForm() {
             success: true,
             update: true,
           });
-          setTimeout(() => router.back(), 2000);
-          // next line is because router.back() uses cache and doesn't revalidate the page
-          setTimeout(() => router.refresh(), 2100);
+          setTimeout(() => {
+            router.push("/projects")
+            router.refresh();
+          }, 2000);
         })
         .catch(() => {
           setMessage({

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
-import FormInput, { Button } from "@/app/ui/auth/form-elements";
-import { ProjectProvider, useProject } from "@/contexts/ProjectContext";
+import { useEffect, useState } from "react";
+import FormInput, { Button, FormInputWithValues } from "@/app/ui/auth/form-elements";
 import UserAvatar from "@/components/UserAvatar";
+import { useAuth } from "@/contexts/AuthContext";
+import { ProjectProvider, useProject } from "@/contexts/ProjectContext";
 
 type Member = {
   role: string;
@@ -27,7 +27,7 @@ export default function ProjectSettingsPage() {
   const { user } = useAuth();
   const [initialProject, setInitialProject] = useState<RawResponse["data"] | null>(null);
   const [loading, setLoading] = useState(true);
-
+  console.log("USER: ", user);
   useEffect(() => {
     fetch(`/api/projects/${projectSlug}`)
       .then((r) => r.json())
@@ -48,6 +48,7 @@ export default function ProjectSettingsPage() {
 function SettingsContent() {
   const { user } = useAuth();
   const { project, updateProject, inviteMember } = useProject();
+
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(project.name);
   const [editingDescription, setEditingDescription] = useState(false);
@@ -55,10 +56,11 @@ function SettingsContent() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [editingRoleFor, setEditingRoleFor] = useState<string | null>(null);
   const [newRole, setNewRole] = useState<string>("");
-
-  const membership = project.members.find((m) => m.user._id === user?._id);
+  console.log("project: ", project);
+  console.log("project: ", project);
+  const membership = project?.members.find((m) => m.user._id === user?._id);
   const isAdmin = membership?.role === "admin";
-
+  if (!project) return null;
   const handleNameSave = () => {
     updateProject({ name }).then(() => setEditingName(false));
   };
@@ -68,6 +70,7 @@ function SettingsContent() {
   };
 
   const handleInvite = () => {
+    // console.log("email: ", inviteEmail);
     inviteMember({ email: inviteEmail }).then(() => setInviteEmail(""));
   };
 
@@ -289,7 +292,7 @@ function SettingsContent() {
             className="mt-4 flex flex-row items-center justify-center space-x-4"
           >
             <div className="flex-4">
-              <FormInput
+              <FormInputWithValues
                 id="invite-email"
                 name="inviteEmail"
                 type="email"

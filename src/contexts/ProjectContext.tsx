@@ -208,22 +208,28 @@ export const ProjectProvider = ({
   };
 
   const inviteMember = async (payload: { email: string }) => {
-    await fetch(`/api/projects/${project.slug}/members`, {
+    const res = await fetch(`/api/projects/${project.slug}/members`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...payload, role: "member" }),
     });
-    // ideally re-fetch members, but here we just append
-    setProject(
-      (prev) =>
-        prev && {
-          ...prev,
-          members: [
-            ...prev.members,
-            { user: { _id: "", name: payload.email }, role: "member" },
-          ],
-        }
-    );
+
+    const response = await res.json();
+
+    if (response.data) {
+      console.log(response.data)
+      // ideally re-fetch members, but here we just append
+      setProject(
+        (prev) =>
+          prev && {
+            ...prev,
+            members: [
+              ...prev.members,
+              { user: { _id: "", name: payload.email }, role: "member" },
+            ],
+          }
+      );
+    }
   };
 
   const contextValue = {

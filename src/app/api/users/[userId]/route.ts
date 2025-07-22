@@ -1,7 +1,7 @@
+import jwt from "jsonwebtoken";
 import { type NextRequest, NextResponse } from "next/server";
 import { Users } from "@/lib/models/Schema";
 import dbConnect from "@/lib/mongoose";
-import jwt from "jsonwebtoken";
 
 export async function DELETE(
   _request: NextRequest,
@@ -85,11 +85,10 @@ export async function GET(
   try {
     await dbConnect();
     const { userId: id } = await params;
-    const users = await Users.find();
     const user = await Users.findById(id);
     console.log(user);
 
-    if (user == undefined || user == null) {
+    if (user === undefined || user == null) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
