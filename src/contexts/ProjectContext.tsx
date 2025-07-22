@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  createContext, useContext,
+  createContext, useCallback, useContext,
   useState
 } from "react";
 import type { ProjectResponse, ProjectTask, UserResponse } from "@/types/api";
@@ -184,30 +184,46 @@ export const ProjectProvider = ({
     setProject((prev) => prev && { ...prev, ...payload });
   };
 
-  const inviteMember = async (payload: { email: string }) => {
-    const res = await fetch(`/api/projects/${project.slug}/members`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...payload, role: "member" }),
-    });
+  // const inviteMember = async (payload: { email: string }) => {
+  //   const res = await fetch(`/api/projects/${project.slug}/members`, {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({ ...payload, role: "member" }),
+  //   });
 
-    const response = await res.json();
+  //   const response = await res.json();
 
-    if (response.data) {
-      console.log(response.data)
-      // ideally re-fetch members, but here we just append
-      setProject(
-        (prev) =>
-          prev && {
-            ...prev,
-            members: [
-              ...prev.members,
-              { user: { _id: "", name: payload.email }, role: "member" },
-            ],
-          }
-      );
-    }
-  };
+  //   if (response.data) {
+  //     console.log(response.data)
+  //     // ideally re-fetch members, but here we just append
+  //     setProject(
+  //       (prev) =>
+  //         prev && {
+  //           ...prev,
+  //           members: [
+  //             ...prev.members,
+  //             { user: { _id: "", name: payload.email }, role: "member" },
+  //           ],
+  //         }
+  //     );
+  //   }
+  // };
+
+  const inviteMember = useCallback(
+    async (payload: { email: string }) => {
+      const res = await fetch(`/api/projects/${project.slug}/members`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...payload, role: "member" }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || "Invite failed");
+      }
+      setProject((prev) => (prev ? { ...prev, members: json.data } : prev));
+    },
+    [project.slug]
+  );
 
   const contextValue = {
     isLoading: loading,
