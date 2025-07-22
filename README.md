@@ -15,11 +15,10 @@ Our project, JUSTDOIT, is a project management tool made for IT teams and organi
 1. Drag and drop task card between multiple columns
 2. Assigning users to a task card
 3. Adding tags to the task card
-4. Creating custom columns for a board
-5. Managing multiple boards created by the person
-6. Inviting different users via email to collaborate
-7. Data flow and optimization for multiple platforms
-8. User roles and permission checking
+4. Managing multiple boards created by the person
+5. Inviting different users via email to collaborate
+6. Data flow and optimization for multiple platforms
+7. User roles and permission checking
 
 ## Task Distribution
 James
