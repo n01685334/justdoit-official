@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
-import env from "@/lib/env";
+import { env } from "@/lib/env";
 import { Users } from "@/lib/models/Schema";
 import dbConnect from "@/lib/mongoose";
 import { User } from "@/types/types";
