@@ -1,175 +1,214 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/app/ui/auth/form-elements";
+import { Button, FormCard, FormInputWithValues } from "@/app/ui/auth/form-elements";
 import UserAvatar from "@/components/UserAvatar";
+import type { UserResponse } from "@/types/api";
+
+/**
+ * User profile page with inline editing capabilities and avatar upload.
+ * Handles profile updates, JWT token refresh, avatar management, and authentication state.
+ * Features toggle between view and edit modes with form validation and error handling.
+ */
 
 export default function ProfilePage() {
-  const { user, logout, updateUser, checkAuth } = useAuth();
   const router = useRouter();
+
+  const [user, setUser] = useState<UserResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+
   const [editing, setEditing] = useState(false);
-  const [name, setName] = useState(user?.name || "");
-  const [bio, setBio] = useState(user?.bio || "");
-  const [avatar, setAvatar] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [bio, setBio] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const [message, setMessage] = useState<{ text: string; success: boolean; show: boolean }>({
+    text: "",
+    success: false,
+    show: false,
+  });
 
   useEffect(() => {
-    if (user && !editing) {
-      setName(user.name || "");
-      setBio(user.bio || "");
-      fetch(`/api/users/${user._id}/avatar`)
-        .then((res) => (res.ok ? res.blob() : Promise.reject(new Error("No avatar"))))
-        .then((blob) => setAvatar(URL.createObjectURL(blob)))
-        .catch(() => setAvatar(null));
+    (async () => {
+      try {
+        const meRes = await fetch("/api/auth/me", { cache: "no-store" });
+        if (!meRes.ok) throw new Error();
+        const { _id } = (await meRes.json()) as { _id: string };
+
+        const uRes = await fetch(`/api/users/${_id}`);
+        if (!uRes.ok) throw new Error();
+        const { data } = (await uRes.json()) as { data: UserResponse };
+
+        setUser(data);
+        setName(data.name);
+        setBio(data.bio || "");
+
+        try {
+          const av = await fetch(`/api/users/${_id}/avatar`);
+          if (av.ok) {
+            const blob = await av.blob();
+            setAvatarUrl(URL.createObjectURL(blob));
+          }
+        } catch { }
+      } catch {
+        router.push("/auth/login");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [router]);
+
+  const handleAvatar = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!user) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setMessage({ ...message, show: false });
+
+    const form = new FormData();
+    form.append("avatar", file);
+
+    try {
+      const res = await fetch(`/api/users/${user._id}/avatar`, { method: "POST", body: form });
+      if (!res.ok) throw new Error();
+
+      const av2 = await fetch(`/api/users/${user._id}/avatar`);
+      if (av2.ok) {
+        const blob = await av2.blob();
+        setAvatarUrl(URL.createObjectURL(blob));
+      }
+
+      setMessage({ text: "Avatar updated.", success: true, show: true });
+    } catch {
+      setMessage({ text: "Avatar upload failed.", success: false, show: true });
+    } finally {
+      setUploading(false);
     }
-  }, [user, editing]);
-
-  useEffect(() => {
-    checkAuth?.();
-  }, [checkAuth]);
+  };
 
   const handleSave = async () => {
-    if (!user?._id || !updateUser) return;
+    if (!user) return;
+    setSaving(true);
+    setMessage({ ...message, show: false });
+
     try {
-      console.log("Saving to API:", { name, bio });
-      const response = await updateUser({ name, bio });
-      // Fetch updated user data and new token from API
-      const updateResponse = await fetch(`/api/users/${user._id}`, {
+      const res = await fetch(`/api/users/${user._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, bio }),
       });
-      if (updateResponse.ok) {
-        const updatedData = await updateResponse.json();
-        setName(updatedData.data.name || "");
-        setBio(updatedData.data.bio || "");
-        // Update the JWT token in the cookie client-side
-        if (updatedData.token) {
-          document.cookie = `token=${updatedData.token}; path=/; secure; samesite=strict`;
-        }
-      }
-      router.refresh(); // Refresh to use the updated token
+      if (!res.ok) throw new Error();
+
+      const { data, token } = (await res.json()) as { data: UserResponse; token?: string };
+      setUser(data);
+      setName(data.name);
+      setBio(data.bio || "");
       setEditing(false);
-    } catch (err) {
-      console.error("Failed to save:", err);
-      alert("Unable to save changes");
-    }
-  };
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user?._id) return;
-
-    const formData = new FormData();
-    formData.append("avatar", file);
-
-    try {
-      const res = await fetch(`/api/users/${user._id}/avatar`, {
-        method: "POST",
-        body: formData,
-      });
-      if (!res.ok) throw new Error("Upload failed");
-      const avatarRes = await fetch(`/api/users/${user._id}/avatar`);
-      if (avatarRes.ok) {
-        const blob = await avatarRes.blob();
-        setAvatar(URL.createObjectURL(blob));
+      if (token) {
+        document.cookie = `access_token=${token};path=/;secure;samesite=strict`;
       }
-    } catch (err) {
-      console.error("Avatar upload failed:", err);
-      alert("Unable to upload avatar");
+
+      setMessage({ text: "Profile saved.", success: true, show: true });
+    } catch {
+      setMessage({ text: "Save failed.", success: false, show: true });
+    } finally {
+      setSaving(false);
     }
   };
 
+  // logout
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "GET" });
+    router.push("/auth/login");
+  };
+
+  if (loading) {
+    return <div className="py-20 text-center text-gray-500">Loading…</div>;
+  }
   if (!user) return null;
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
-      <h1 className="text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100">
-        My Profile
-      </h1>
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 space-y-6">
-        <UserAvatar user={user} size={96} />
-        {!editing ? (
-          <>
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Name
-              </label>
-              <p className="mt-1 text-lg text-gray-900 dark:text-gray-100">{user.name}</p>
+      <h1 className="text-3xl font-semibold mb-6">My Profile</h1>
+
+      {!editing ? (
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 space-y-4">
+          <div className="flex items-center space-x-4">
+            <UserAvatar user={user} size={96} src={avatarUrl ?? undefined} />
+            <div>
+              <h2 className="text-lg font-medium">{user.name}</h2>
+              <p className="text-sm text-gray-500">{user.email}</p>
             </div>
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Email
-              </label>
-              <p className="mt-1 text-lg text-gray-900 dark:text-gray-100">{user.email}</p>
+          </div>
+          <p><strong>Role:</strong> {user.role}</p>
+          <p><strong>Bio:</strong> {user.bio || "No bio"}</p>
+          <div className="flex space-x-4">
+            <Button label="Edit" onClick={() => setEditing(true)} />
+            <Button label="Logout" onClick={handleLogout} />
+          </div>
+        </div>
+      ) : (
+        <FormCard onSubmit={handleSave}>
+          {message.show && (
+            <div
+              className={`p-4 mb-4 text-white ${message.success ? "bg-green-600" : "bg-red-600"
+                } rounded`}
+            >
+              {message.text}
             </div>
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Role
-              </label>
-              <p className="mt-1 text-lg text-gray-900 dark:text-gray-100">{user.role}</p>
+          )}
+
+          <div className="flex items-center space-x-4 mb-4">
+            <UserAvatar user={user} size={96} src={avatarUrl ?? undefined} />
+            <div>
+              <label className="block text-sm font-medium">Avatar</label>
+              <input type="file" accept="image/*" onChange={handleAvatar} disabled={uploading} />
+              {uploading && <p className="text-xs text-gray-500">Uploading…</p>}
             </div>
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Bio
-              </label>
-              <p className="mt-1 text-lg text-gray-900 dark:text-gray-100">
-                {user.bio || "No bio provided"}
-              </p>
-            </div>
-            <div className="mt-6 flex space-x-4">
-              <Button type="button" label="Edit Profile" onClick={() => setEditing(true)} />
-              <Button type="button" label="Logout" onClick={logout} />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="space-y-2">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Name
-              </label>
-              <input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Bio
-              </label>
-              <textarea
-                id="bio"
-                value={bio || user.bio || ""}
-                onChange={(e) => setBio(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                rows={3}
-              />
-            </div>
-            <div className="space-y-2">
-              <label
-                htmlFor="avatar-upload"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Upload Avatar
-              </label>
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarUpload}
-                className="mt-1"
-              />
-            </div>
-            <div className="mt-6 flex space-x-4">
-              <Button type="button" label="Save" onClick={handleSave} />
-              <Button type="button" label="Cancel" onClick={() => setEditing(false)} />
-            </div>
-          </>
-        )}
-      </div>
+          </div>
+
+          <FormInputWithValues
+            id="name"
+            name="name"
+            type="text"
+            label="Name"
+            value={name}
+            handleOnChange={(e) => setName(e.target.value)}
+          />
+
+          <div className="space-y-2 mb-4">
+            <label htmlFor="bio" className="block text-sm font-medium">
+              Bio
+            </label>
+            <textarea
+              id="bio"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 border rounded"
+            />
+          </div>
+
+          <div className="flex space-x-4">
+            <Button
+              label={saving ? "Saving…" : "Save"}
+              onClick={() => !saving && handleSave()}
+              className={saving ? "opacity-50 cursor-not-allowed" : ""}
+            />
+            <Button
+              label="Cancel"
+              onClick={() => !saving && setEditing(false)}
+              className={saving ? "opacity-50 cursor-not-allowed" : ""}
+            />
+          </div>
+        </FormCard>
+      )}
     </div>
   );
 }
