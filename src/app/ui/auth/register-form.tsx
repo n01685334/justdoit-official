@@ -38,6 +38,12 @@ const fields = [
   },
 ];
 
+/**
+ * Registration form component with account creation and user feedback.
+ * Handles signup with name, email, password confirmation, displays status messages,
+ * and navigates back to previous page on successful account creation.
+ */
+
 export default function RegisterForm() {
   const [message, setMessage] = useState<{
     message: string;

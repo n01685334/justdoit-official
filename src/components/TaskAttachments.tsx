@@ -21,6 +21,12 @@ interface TaskAttachmentsProps {
   userId: string; // Add userId prop
 }
 
+/**
+ * Task attachment management component with file upload, download, and deletion.
+ * Handles local file selection, server upload with progress tracking, and existing attachment display.
+ * Features optimistic UI updates and session-based upload status indicators.
+ */
+
 export default function TaskAttachments({ taskId, userId }: TaskAttachmentsProps) {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [uploading, setUploading] = useState<string[]>([]);
@@ -34,8 +40,6 @@ export default function TaskAttachments({ taskId, userId }: TaskAttachmentsProps
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
-
-
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;

@@ -1,15 +1,20 @@
-import { getUserProjects } from "@/lib/api/api-helpers";
-import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/api/auth-helpers";
-import HeaderUserMenu from "@/components/HeaderUserMenu";
-import { UserResponse } from "@/types/api";
-import ProjectsList from "@/components/UserProjects";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import HeaderUserMenu from "@/components/HeaderUserMenu";
+import ProjectsList from "@/components/UserProjects";
+import { getUserProjects } from "@/lib/api/api-helpers";
+import { getCurrentUser } from "@/lib/api/auth-helpers";
+import { UserResponse } from "@/types/api";
 
 async function refreshProjects() {
   "use server";
   revalidatePath("/projects");
 }
+/**
+ * Projects listing page showing owned and member projects with creation functionality.
+ * Features authentication check, server action for cache revalidation, and separate
+ * sections for owned projects (with create capability) and member projects (read-only).
+ */
 
 const Page = async () => {
   // check if the user is logged in

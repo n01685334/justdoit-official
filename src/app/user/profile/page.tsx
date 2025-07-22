@@ -12,6 +12,12 @@ import type { UserResponse } from "@/types/api";
  * Features toggle between view and edit modes with form validation and error handling.
  */
 
+/**
+ * User profile page with inline editing capabilities and avatar upload.
+ * Handles profile updates, JWT token refresh, avatar management, and authentication state.
+ * Features toggle between view and edit modes with form validation and error handling.
+ */
+
 export default function ProfilePage() {
   const router = useRouter();
 

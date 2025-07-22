@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
+// not used
 export default function InitializeAuth({
   children,
 }: {
@@ -12,21 +13,21 @@ export default function InitializeAuth({
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    setLoading(true);
+  // useEffect(() => {
+  //   setLoading(true);
 
-    if (user === undefined) {
-      if (checkAuth) {
-        checkAuth().then((res) => {
-          if (!res) {
-            router.push("/auth/login");
-          }
-        });
-      }
-    }
+  //   if (user === undefined) {
+  //     if (checkAuth) {
+  //       checkAuth().then((res) => {
+  //         if (!res) {
+  //           router.push("/auth/login");
+  //         }
+  //       });
+  //     }
+  //   }
 
-    setLoading(false);
-  }, [user, checkAuth, router]);
+  //   setLoading(false);
+  // }, [user, checkAuth, router]);
 
-  return <>{!loading && children}</>;
+  return <>{children}</>;
 }

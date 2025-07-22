@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { UserResponse } from "@/types/api";
-import { useRouter } from "next/navigation";
+import { JwtUser } from "@/types/types";
 
 interface HeaderUserMenuProps {
-  user: UserResponse;
+  user: UserResponse | JwtUser;
 }
 
 export const getInitials = (name: string) => {
@@ -17,6 +18,11 @@ export const getInitials = (name: string) => {
     .toUpperCase()
     .slice(0, 2);
 };
+/**
+ * User avatar dropdown menu component with navigation and logout functionality.
+ * Features click-outside detection, user initials display, and authenticated user actions.
+ * Handles logout API calls and navigation to user-related pages.
+ */
 
 const HeaderUserMenu = ({ user }: HeaderUserMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { Users } from "@/lib/models/Schema";
 import jwt from "jsonwebtoken";
+import { NextRequest, NextResponse } from "next/server";
+import { Users } from "@/lib/models/Schema";
 import dbConnect from "@/lib/mongoose";
 
 async function getUserByEmail(email: string) {
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         role: user.role,
         bio: user.bio,
       },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET as string
     );
 
     /// Set HTTP-only cookie

@@ -5,6 +5,12 @@ import { ProjectProvider } from "@/contexts/ProjectContext";
 import { getProjectBySlug } from "@/lib/api/api-helpers";
 import { getCurrentUser } from "@/lib/api/auth-helpers";
 
+/**
+ * Main project page with authentication and authorization checks.
+ * Verifies user login and project membership before rendering kanban board.
+ * Provides project context to child components with header and board layout.
+ */
+
 const Page = async ({
   params,
 }: {

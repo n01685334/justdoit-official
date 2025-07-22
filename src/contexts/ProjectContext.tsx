@@ -1,41 +1,18 @@
 "use client";
 
 import {
-  createContext,
-  type Dispatch,
-  type SetStateAction,
-  useContext,
-  useState,
+  createContext, useCallback, useContext,
+  useState
 } from "react";
 import type { ProjectResponse, ProjectTask, UserResponse } from "@/types/api";
+import { DragState, ProjectContextType } from "@/types/types";
 
-type DragState = {
-  draggedTaskId: string | null;
-  fromColumnId: string | null;
-  isDragging: boolean;
-};
-
-type ProjectContextType = {
-  project: ProjectResponse | null;
-  user: UserResponse | null;
-  isLoading: boolean;
-  error: string | null;
-  addTask: (columnId: string, newTask: ProjectTask) => void;
-  updateTask: (taskId: string, updatedTask: ProjectTask) => void;
-  moveTaskToColumn: (
-    taskId: string,
-    fromColumnId: string,
-    toColumnId: string,
-    dropIndex?: number
-  ) => void;
-  removeTask: (taskId: string) => void;
-  setTaskLoading: (taskId: string, loading: boolean) => void;
-  dragState: DragState;
-  setDragState: Dispatch<SetStateAction<DragState>>;
-  isOwner: boolean;
-  inviteMember: (payload?: object) => Promise<void>;
-  updateProject: (payload?: object) => Promise<void>;
-};
+/**
+ * Project context provider for managing project state, tasks, and drag-and-drop operations.
+ * Handles task CRUD operations, column movements, project updates, member invitations,
+ * and provides drag state management for kanban board functionality.
+ * Requires user authentication and initial project data to function.
+ */
 
 export const ProjectContext = createContext<ProjectContextType | undefined>(
   undefined
@@ -207,24 +184,46 @@ export const ProjectProvider = ({
     setProject((prev) => prev && { ...prev, ...payload });
   };
 
-  const inviteMember = async (payload: { email: string }) => {
-    await fetch(`/api/projects/${project.slug}/members`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...payload, role: "member" }),
-    });
-    // ideally re-fetch members, but here we just append
-    setProject(
-      (prev) =>
-        prev && {
-          ...prev,
-          members: [
-            ...prev.members,
-            { user: { _id: "", name: payload.email }, role: "member" },
-          ],
-        }
-    );
-  };
+  // const inviteMember = async (payload: { email: string }) => {
+  //   const res = await fetch(`/api/projects/${project.slug}/members`, {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({ ...payload, role: "member" }),
+  //   });
+
+  //   const response = await res.json();
+
+  //   if (response.data) {
+  //     console.log(response.data)
+  //     // ideally re-fetch members, but here we just append
+  //     setProject(
+  //       (prev) =>
+  //         prev && {
+  //           ...prev,
+  //           members: [
+  //             ...prev.members,
+  //             { user: { _id: "", name: payload.email }, role: "member" },
+  //           ],
+  //         }
+  //     );
+  //   }
+  // };
+
+  const inviteMember = useCallback(
+    async (payload: { email: string }) => {
+      const res = await fetch(`/api/projects/${project.slug}/members`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...payload, role: "member" }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || "Invite failed");
+      }
+      setProject((prev) => (prev ? { ...prev, members: json.data } : prev));
+    },
+    [project.slug]
+  );
 
   const contextValue = {
     isLoading: loading,

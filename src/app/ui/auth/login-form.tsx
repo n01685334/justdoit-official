@@ -22,6 +22,11 @@ const fields = [
     required: true,
   },
 ];
+/**
+ * Login form component with authentication integration and user feedback.
+ * Handles form submission, displays success/error messages, and redirects
+ * to projects page on successful authentication with loading states.
+ */
 
 export default function LoginForm() {
   const [message, setMessage] = useState<{
@@ -55,9 +60,10 @@ export default function LoginForm() {
             success: true,
             update: true,
           });
-          setTimeout(() => router.back(), 2000);
-          // next line is because router.back() uses cache and doesn't revalidate the page
-          setTimeout(() => router.refresh(), 2100);
+          setTimeout(() => {
+            router.push("/projects")
+            router.refresh();
+          }, 2000);
         })
         .catch(() => {
           setMessage({

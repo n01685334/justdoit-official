@@ -2,20 +2,21 @@
 
 import { createContext, useContext, useState } from "react";
 import type { UserResponse } from "@/types/api";
+import { AuthContextType } from "@/types/types";
 
-interface AuthContextType {
-  user?: UserResponse;
-  checkAuth?: () => Promise<boolean>;
-  login?: (email: string, password: string) => Promise<void>;
-  logout?: () => Promise<void>;
-  signup?: (email: string, password: string, name: string) => Promise<void>;
-  updateUser?: (userData: Partial<UserResponse>) => Promise<void>;
-}
+
+/**
+ * Auth context provider for managing user authentication state and operations.
+ * Provides login, logout, signup, user updates, and auth checking across the app.
+ */
+
 
 export const AuthContext = createContext<AuthContextType>({});
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<UserResponse | undefined>(undefined);
+
+
+export const AuthProvider = ({ userData, children }: { userData: UserResponse | undefined, children: React.ReactNode }) => {
+  const [user, setUser] = useState<UserResponse | undefined>(userData);
 
   const checkAuth = async (): Promise<boolean> => {
     try {

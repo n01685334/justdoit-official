@@ -35,7 +35,6 @@ export type UserResponse = {
   __v?: number;
   role: ProjectRole;
   avatar?: string;
-  rm;
   bio?: string;
   lastActive?: Date;
   createdAt?: Date;

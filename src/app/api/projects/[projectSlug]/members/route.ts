@@ -6,11 +6,12 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ projectSlug: string }> }
 ) {
+
   try {
     await dbConnect();
     const { projectSlug } = await params;
     const { email } = await request.json();
-
+    console.log("EMAIL: ", email);
     const user = await Users.findOne({ email });
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
